@@ -16,7 +16,8 @@
     "AUTH_GOOGLE_ID",
     "AUTH_GOOGLE_SECRET",
     "APP_URL",
-    "VERCEL_URL"
+    "VERCEL_URL",
+    "AGENT_STATE_DIR"
   ],
   "tasks": {
     "build": {
@@ -49,6 +50,10 @@
       "cache": false
     },
     "db:migrate": {
+      "cache": false
+    },
+    "openapi:export": {
+      "dependsOn": ["build"],
       "cache": false
     }
   }

@@ -4,11 +4,11 @@ structure:
     - name: web
       type: next-app
       port: 3000
-      depends_on: [ui, db, ai, auth]
+      depends_on: [ui, db, ai, auth, state]
     - name: bot
       type: next-app
       port: 3001
-      depends_on: [ai, db, auth]
+      depends_on: [ai, state, db, auth]
     - name: docs
       type: next-app
       port: 3002
@@ -29,6 +29,9 @@ structure:
     - name: ai
       type: library
       depends_on: [config, types]
+    - name: state
+      type: library
+      depends_on: [types]
     - name: ui
       type: component-library
       depends_on: [config, types]

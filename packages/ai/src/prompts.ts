@@ -38,3 +38,6 @@ export function systemPrompt({ selectedChatModel }: { selectedChatModel: string 
   }
   return `${regularPrompt}\n\n${artifactsPrompt}`;
 }
+
+// Re-export schema-aware prompt compilation
+export { compileSystemPrompt } from "./schema-prompt";

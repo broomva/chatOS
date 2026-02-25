@@ -5,12 +5,36 @@ import { Button } from "@chatos/ui";
 import { Send } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
-export function Chat() {
+export function Chat({ sessionId }: { sessionId?: string }) {
+  const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(sessionId);
   const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  // Create a session on first message if none exists
+  useEffect(() => {
+    const firstMessage = messages[0];
+    if (!currentSessionId && messages.length === 1 && firstMessage?.role === "user") {
+      const firstPart = firstMessage.parts?.[0];
+      const title =
+        firstPart?.type === "text"
+          ? (firstPart as { type: "text"; text: string }).text.slice(0, 50)
+          : "New chat";
+      fetch("/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      })
+        .then((res) => res.json())
+        .then((session) => {
+          setCurrentSessionId(session.id);
+          window.history.replaceState(null, "", `/chat/${session.id}`);
+        })
+        .catch(console.error);
+    }
+  }, [messages, currentSessionId]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll when messages change
   useEffect(() => {
@@ -20,7 +44,7 @@ export function Chat() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    sendMessage({ text: input });
+    sendMessage({ text: input }, { body: { sessionId: currentSessionId } });
     setInput("");
   }
 

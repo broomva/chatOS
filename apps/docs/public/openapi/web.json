@@ -1,0 +1,312 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "chatOS Web API",
+    "version": "0.1.0",
+    "description": "AI chat application API. Provides streaming chat completions powered by multiple LLM providers via the Vercel AI Gateway."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "tags": [
+    { "name": "Chat", "description": "AI chat streaming endpoints" },
+    { "name": "Reference", "description": "API documentation" }
+  ],
+  "paths": {
+    "/api/chat": {
+      "post": {
+        "operationId": "streamChat",
+        "tags": ["Chat"],
+        "summary": "Stream a chat completion",
+        "description": "Sends a list of messages to the selected AI model and returns a streaming Server-Sent Events (SSE) response using the Vercel AI SDK UI message stream protocol. Supports tool calls (getWeather, createDocument, updateDocument, requestSuggestions) that the model can invoke during generation.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Streaming SSE response with AI SDK UI message stream protocol",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Server-Sent Events stream. Each event contains a JSON-encoded UI message stream part (text-delta, tool-call, tool-result, finish, error, etc.)."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid session cookie"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/reference": {
+      "get": {
+        "operationId": "apiReference",
+        "tags": ["Reference"],
+        "summary": "Interactive API documentation",
+        "description": "Renders a Scalar API reference UI for exploring the chatOS Web API.",
+        "responses": {
+          "200": {
+            "description": "HTML page with interactive API documentation",
+            "content": {
+              "text/html": {
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "description": "Better Auth session token cookie. Obtained after signing in via OAuth (GitHub, Google) or credentials."
+      }
+    },
+    "schemas": {
+      "ChatRequest": {
+        "type": "object",
+        "required": ["messages"],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "description": "Conversation message history",
+            "items": {
+              "$ref": "#/components/schemas/UIMessage"
+            }
+          },
+          "selectedModel": {
+            "type": "string",
+            "description": "Model ID to use for completion. Defaults to anthropic/claude-sonnet-4.5.",
+            "enum": [
+              "anthropic/claude-haiku-4.5",
+              "anthropic/claude-sonnet-4.5",
+              "anthropic/claude-opus-4.5",
+              "openai/gpt-4.1-mini",
+              "openai/gpt-5.2",
+              "google/gemini-2.5-flash-lite",
+              "google/gemini-3-pro-preview",
+              "xai/grok-4.1-fast-non-reasoning",
+              "anthropic/claude-3.7-sonnet-thinking"
+            ],
+            "default": "anthropic/claude-sonnet-4.5"
+          }
+        }
+      },
+      "UIMessage": {
+        "type": "object",
+        "required": ["role", "content"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique message identifier"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant", "system", "tool"],
+            "description": "The role of the message sender"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text content of the message"
+          },
+          "parts": {
+            "type": "array",
+            "description": "Structured message parts (text, images, tool invocations, sources, reasoning)",
+            "items": {
+              "$ref": "#/components/schemas/MessagePart"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Attachment"
+            }
+          }
+        }
+      },
+      "MessagePart": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["type", "text"],
+            "properties": {
+              "type": { "type": "string", "const": "text" },
+              "text": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["type", "image"],
+            "properties": {
+              "type": { "type": "string", "const": "image" },
+              "image": { "type": "string", "description": "Base64-encoded image or URL" },
+              "mimeType": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["type", "toolInvocation"],
+            "properties": {
+              "type": { "type": "string", "const": "tool-invocation" },
+              "toolInvocation": {
+                "$ref": "#/components/schemas/ToolInvocation"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["type", "source"],
+            "properties": {
+              "type": { "type": "string", "const": "source" },
+              "source": {
+                "$ref": "#/components/schemas/Source"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["type", "reasoning"],
+            "properties": {
+              "type": { "type": "string", "const": "reasoning" },
+              "reasoning": { "type": "string" },
+              "details": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReasoningDetail"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ToolInvocation": {
+        "type": "object",
+        "required": ["toolCallId", "toolName", "args", "state"],
+        "properties": {
+          "toolCallId": { "type": "string" },
+          "toolName": {
+            "type": "string",
+            "enum": ["getWeather", "createDocument", "updateDocument", "requestSuggestions"]
+          },
+          "args": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/GetWeatherArgs" },
+              { "$ref": "#/components/schemas/CreateDocumentArgs" },
+              { "$ref": "#/components/schemas/UpdateDocumentArgs" },
+              { "$ref": "#/components/schemas/RequestSuggestionsArgs" }
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": ["partial-call", "call", "result"]
+          },
+          "result": {}
+        }
+      },
+      "GetWeatherArgs": {
+        "type": "object",
+        "required": ["latitude", "longitude"],
+        "description": "Get the current weather at a location",
+        "properties": {
+          "latitude": { "type": "number", "description": "Latitude" },
+          "longitude": { "type": "number", "description": "Longitude" }
+        }
+      },
+      "CreateDocumentArgs": {
+        "type": "object",
+        "required": ["title", "kind"],
+        "description": "Create a new document artifact",
+        "properties": {
+          "title": { "type": "string", "description": "Title of the document" },
+          "kind": {
+            "type": "string",
+            "enum": ["text", "code", "image", "sheet"],
+            "description": "Type of document"
+          }
+        }
+      },
+      "UpdateDocumentArgs": {
+        "type": "object",
+        "required": ["id", "description"],
+        "description": "Update an existing document artifact",
+        "properties": {
+          "id": { "type": "string", "description": "ID of the document to update" },
+          "description": { "type": "string", "description": "Description of changes to make" }
+        }
+      },
+      "RequestSuggestionsArgs": {
+        "type": "object",
+        "required": ["documentId"],
+        "description": "Request suggestions for improving a document",
+        "properties": {
+          "documentId": { "type": "string", "description": "ID of the document" }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "ReasoningDetail": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["type", "text"],
+            "properties": {
+              "type": { "type": "string", "const": "text" },
+              "text": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["type", "data"],
+            "properties": {
+              "type": { "type": "string", "const": "redacted" },
+              "data": { "type": "string" }
+            }
+          }
+        ]
+      },
+      "Attachment": {
+        "type": "object",
+        "required": ["name", "contentType", "url"],
+        "properties": {
+          "name": { "type": "string" },
+          "contentType": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      },
+      "WeatherResult": {
+        "type": "object",
+        "properties": {
+          "temperature": { "type": "number", "description": "Current temperature" },
+          "unit": { "type": "string", "description": "Temperature unit (celsius)" }
+        }
+      }
+    }
+  }
+}

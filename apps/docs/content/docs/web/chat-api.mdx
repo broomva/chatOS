@@ -1,0 +1,88 @@
+---
+title: Chat API
+description: POST /api/chat — streaming chat completion endpoint
+---
+
+# Chat API
+
+The chat endpoint accepts a conversation history and returns a streaming response.
+
+## Endpoint
+
+```
+POST /api/chat
+```
+
+## Authentication
+
+Requires a `better-auth.session_token` cookie. Users must sign in via OAuth (GitHub or Google) before using the chat API.
+
+## Request Body
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the weather in Paris?"
+    }
+  ],
+  "selectedModel": "anthropic/claude-sonnet-4.5"
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `messages` | `UIMessage[]` | Yes | Conversation message history |
+| `selectedModel` | `string` | No | Model ID (defaults to `anthropic/claude-sonnet-4.5`) |
+
+See [Models](/docs/web/models) for all available model IDs.
+
+## Response
+
+The response is a **Server-Sent Events** stream following the [AI SDK UI message stream protocol](/docs/web/streaming).
+
+```
+Content-Type: text/event-stream
+```
+
+Each event contains a JSON-encoded stream part:
+
+```
+data: {"type":"text-delta","textDelta":"Hello"}
+
+data: {"type":"text-delta","textDelta":" world"}
+
+data: {"type":"finish","finishReason":"stop","usage":{"promptTokens":10,"completionTokens":5}}
+```
+
+## Tools
+
+The chat endpoint has access to these tools that the model can invoke:
+
+| Tool | Description |
+|---|---|
+| `getWeather` | Get current weather at a latitude/longitude |
+| `createDocument` | Create a new document artifact (text, code, image, sheet) |
+| `updateDocument` | Update an existing document |
+| `requestSuggestions` | Request improvement suggestions for a document |
+
+See [Tools](/docs/web/tools) for detailed schemas.
+
+## Example
+
+```bash
+curl -X POST http://localhost:3000/api/chat \
+  -H "Content-Type: application/json" \
+  -H "Cookie: better-auth.session_token=YOUR_TOKEN" \
+  -d '{
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "selectedModel": "anthropic/claude-sonnet-4.5"
+  }'
+```
+
+## Interactive Docs
+
+Visit [localhost:3000/api/reference](http://localhost:3000/api/reference) for an interactive Scalar API reference with the full OpenAPI spec.

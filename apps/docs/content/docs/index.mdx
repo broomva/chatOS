@@ -1,0 +1,47 @@
+---
+title: Overview
+description: Welcome to the chatOS documentation
+---
+
+# chatOS
+
+chatOS is an AI chat platform built as a Turborepo monorepo. It provides a full-featured web chat application with multi-model support, a multi-platform bot service, and shared packages for AI, authentication, database, and UI components.
+
+## What's Inside
+
+| App / Package | Description |
+|---|---|
+| **[Web App](/docs/web)** | Next.js AI chatbot with streaming, artifacts, and multi-model support |
+| **[Bot](/docs/bot)** | Elysia.js multi-platform bot service (Slack, and more) |
+| **[Docs](/docs)** | This documentation site (Fumadocs) |
+| **[@chatos/ai](/docs/packages/ai)** | AI SDK models, tools, prompts, and streaming utilities |
+| **[@chatos/db](/docs/packages/db)** | Drizzle ORM schema and database queries |
+| **[@chatos/auth](/docs/packages/auth)** | Better Auth configuration |
+| **[@chatos/types](/docs/packages/types)** | Shared TypeScript type definitions |
+| **[@chatos/ui](/docs/packages/ui)** | shadcn/ui shared components |
+| **@chatos/config** | Shared tsconfig, Biome, and Tailwind presets |
+
+## Key Technologies
+
+- **Runtime**: Bun
+- **Web Framework**: Next.js 16 (web, docs) + Elysia.js (bot)
+- **AI**: Vercel AI SDK v6 + AI Gateway for multi-provider routing
+- **Database**: PostgreSQL + Drizzle ORM
+- **Auth**: Better Auth (OAuth + credentials)
+- **UI**: shadcn/ui + Radix + Tailwind CSS v4
+- **Monorepo**: Turborepo
+- **Lint & Format**: Biome
+
+## Architecture
+
+```
+apps/web   ──→  @chatos/ui, @chatos/db, @chatos/ai, @chatos/auth
+apps/bot   ──→  @chatos/ai, @chatos/types
+apps/docs  ──→  @chatos/config, @chatos/ui
+
+packages/config, packages/types  (leaf — no deps)
+  → packages/db    (config, types)
+  → packages/auth  (config, types, db)
+  → packages/ai    (config, types)
+  → packages/ui    (config, types)
+```

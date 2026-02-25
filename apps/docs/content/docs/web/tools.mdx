@@ -1,0 +1,74 @@
+---
+title: Tools
+description: AI tools available during chat
+---
+
+# Tools
+
+The chat endpoint provides tools that the AI model can invoke during a conversation. Tools are defined with Zod schemas in `packages/ai/src/tools/index.ts`.
+
+## getWeather
+
+Get the current weather at a geographic location.
+
+**Parameters:**
+
+| Field | Type | Description |
+|---|---|---|
+| `latitude` | `number` | Latitude of the location |
+| `longitude` | `number` | Longitude of the location |
+
+**Returns:**
+
+```json
+{
+  "temperature": 22.5,
+  "unit": "celsius"
+}
+```
+
+Uses the [Open-Meteo API](https://open-meteo.com/) — no API key required.
+
+## createDocument
+
+Create a new document artifact that appears in the side panel.
+
+**Parameters:**
+
+| Field | Type | Description |
+|---|---|---|
+| `title` | `string` | Title of the document |
+| `kind` | `"text" \| "code" \| "image" \| "sheet"` | Type of document to create |
+
+This is a client-side tool — the AI SDK handles the UI rendering.
+
+## updateDocument
+
+Update an existing document artifact.
+
+**Parameters:**
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `string` | ID of the document to update |
+| `description` | `string` | Description of changes to make |
+
+## requestSuggestions
+
+Request improvement suggestions for a document.
+
+**Parameters:**
+
+| Field | Type | Description |
+|---|---|---|
+| `documentId` | `string` | ID of the document to get suggestions for |
+
+## Tool Invocation Flow
+
+1. The AI model decides to call a tool based on the conversation context
+2. A `tool-call` stream part is sent with the tool name and arguments
+3. For server-side tools (like `getWeather`), execution happens automatically
+4. A `tool-result` stream part is sent back with the result
+5. The model uses the result to continue generating its response
+
+In the UI, tool invocations appear as structured `MessagePart` objects with type `"tool-invocation"`.

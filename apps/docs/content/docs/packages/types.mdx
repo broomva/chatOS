@@ -1,0 +1,75 @@
+---
+title: "@chatos/types"
+description: Shared TypeScript type definitions
+---
+
+# @chatos/types
+
+Shared TypeScript types used across all apps and packages.
+
+## Type Categories
+
+### User & Auth
+
+```typescript
+type User = { id: string; email: string; name?: string; image?: string };
+type Session = { user: User; expires: string };
+```
+
+### Chat
+
+```typescript
+type Chat = { id: string; title: string; userId: string; visibility: "public" | "private"; createdAt: Date };
+type MessageRole = "user" | "assistant" | "system" | "tool";
+type Message = { id: string; chatId: string; role: MessageRole; parts: MessagePart[]; attachments: Attachment[]; createdAt: Date };
+```
+
+### Message Parts
+
+```typescript
+type MessagePart =
+  | { type: "text"; text: string }
+  | { type: "image"; image: string; mimeType?: string }
+  | { type: "tool-invocation"; toolInvocation: ToolInvocation }
+  | { type: "source"; source: Source }
+  | { type: "reasoning"; reasoning: string; details?: ReasoningDetail[] };
+```
+
+### Tool Invocations
+
+```typescript
+type ToolInvocation = {
+  toolCallId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+  state: "partial-call" | "call" | "result";
+  result?: unknown;
+};
+```
+
+### Documents & Artifacts
+
+```typescript
+type ArtifactKind = "text" | "code" | "image" | "sheet";
+type Document = { id: string; title: string; content: string | null; kind: ArtifactKind; userId: string; createdAt: Date };
+```
+
+### AI Models
+
+```typescript
+type ChatModel = { id: string; name: string; provider: string; description: string };
+type ModelProvider = "anthropic" | "openai" | "google" | "xai" | "reasoning";
+```
+
+### Bot
+
+```typescript
+type BotPlatform = "slack" | "teams" | "discord";
+type BotEvent = { platform: BotPlatform; type: "message" | "mention" | "reaction" | "thread_reply"; channelId: string; userId: string; text: string; threadId?: string; timestamp: string };
+```
+
+## Usage
+
+```typescript
+import type { Message, ChatModel, BotEvent } from "@chatos/types";
+```

@@ -1,0 +1,40 @@
+---
+title: "@chatos/ui"
+description: Shared UI components
+---
+
+# @chatos/ui
+
+Shared UI component library built on [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) + [Tailwind CSS v4](https://tailwindcss.com/).
+
+## Stack
+
+- **shadcn/ui** — Beautifully designed, accessible components
+- **Radix UI** — Unstyled, accessible primitives (Dialog, Dropdown, Select, etc.)
+- **Tailwind CSS v4** — Utility-first CSS framework
+- **class-variance-authority** — Type-safe component variants
+- **tailwind-merge** — Intelligent class merging
+
+## Usage
+
+Components are imported from `@chatos/ui`:
+
+```typescript
+import { Button } from "@chatos/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@chatos/ui/dialog";
+```
+
+## Adding Components
+
+Use the shadcn CLI to add new components:
+
+```bash
+cd packages/ui
+bunx shadcn@latest add <component-name>
+```
+
+Components are stored in `packages/ui/src/components/` and automatically available to all apps.
+
+## Theming
+
+The web app uses `next-themes` for dark mode support. Theme variables are defined in Tailwind CSS and the components adapt automatically.

@@ -1,0 +1,54 @@
+---
+title: "@chatos/ai"
+description: AI models, tools, prompts, and streaming utilities
+---
+
+# @chatos/ai
+
+The AI package provides model definitions, tool schemas, system prompts, and streaming configuration used by both the web app and bot.
+
+## Exports
+
+### Models (`@chatos/ai/models`)
+
+```typescript
+import { chatModels, DEFAULT_CHAT_MODEL, modelsByProvider } from "@chatos/ai/models";
+```
+
+- **`chatModels`** — Array of all 9 available models
+- **`DEFAULT_CHAT_MODEL`** — `"anthropic/claude-sonnet-4.5"`
+- **`modelsByProvider`** — Models grouped by provider name
+
+### Tools (`@chatos/ai`)
+
+```typescript
+import { weatherTool, createDocumentTool, updateDocumentTool, requestSuggestionsTool } from "@chatos/ai";
+```
+
+All tools are defined using `tool()` from the AI SDK with Zod input schemas.
+
+### Prompts (`@chatos/ai`)
+
+```typescript
+import { systemPrompt, regularPrompt, artifactsPrompt, titlePrompt } from "@chatos/ai";
+```
+
+- **`systemPrompt({ selectedChatModel })`** — Returns the appropriate system prompt based on model type. Reasoning models get a simpler prompt; standard models get the full prompt with artifact instructions.
+- **`regularPrompt`** — Base friendly assistant prompt
+- **`artifactsPrompt`** — Instructions for document/artifact creation
+- **`titlePrompt`** — Chat title generation prompt
+
+## AI Gateway
+
+Models are accessed through the [Vercel AI Gateway](https://sdk.vercel.ai/docs/ai-sdk-core/settings#ai-gateway), which provides:
+
+- Unified API across providers
+- Automatic retries and fallbacks
+- Usage tracking and rate limiting
+- Provider key management
+
+```typescript
+import { gateway } from "@ai-sdk/gateway";
+
+const model = gateway("anthropic/claude-sonnet-4.5");
+```

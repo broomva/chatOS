@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo --port 3001",
-    "build": "next build",
-    "start": "next start",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun dist/index.js",
     "lint": "biome check --diagnostic-level=error .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "openapi:export": "bun src/openapi/spec-export.ts"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.15",
@@ -15,18 +16,16 @@
     "@chat-adapter/state-memory": "^4.14.0",
     "@chat-adapter/state-redis": "^4.14.0",
     "@chatos/ai": "workspace:*",
+    "@chatos/state": "workspace:*",
     "@chatos/types": "workspace:*",
+    "@elysiajs/openapi": "^1.0.0",
     "ai": "^6.0.37",
     "chat": "^4.14.0",
-    "next": "^16.0.10",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "elysia": "^1.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^22.8.6",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
     "typescript": "^5.8.3"
   }
 }

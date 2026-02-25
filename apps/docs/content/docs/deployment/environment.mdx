@@ -1,0 +1,67 @@
+---
+title: Environment Variables
+description: Complete environment variable reference
+---
+
+# Environment Variables
+
+All environment variables used across chatOS apps.
+
+## Web App (`apps/web`)
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `AUTH_SECRET` | Yes | Secret for signing auth tokens |
+| `AI_GATEWAY_API_KEY` | Yes* | Vercel AI Gateway API key |
+| `OPENAI_API_KEY` | Alt* | Direct OpenAI API key |
+| `REDIS_URL` | Yes | Redis URL for resumable streams |
+| `BLOB_READ_WRITE_TOKEN` | No | Vercel Blob storage token |
+| `AUTH_GITHUB_ID` | No | GitHub OAuth client ID |
+| `AUTH_GITHUB_SECRET` | No | GitHub OAuth client secret |
+| `AUTH_GOOGLE_ID` | No | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | No | Google OAuth client secret |
+| `APP_URL` | No | Public app URL (for auth callbacks) |
+| `VERCEL_URL` | No | Auto-set by Vercel |
+
+*Either `AI_GATEWAY_API_KEY` or direct provider keys are required.
+
+## Bot (`apps/bot`)
+
+| Variable | Required | Description |
+|---|---|---|
+| `AI_GATEWAY_API_KEY` | Yes* | Vercel AI Gateway API key |
+| `OPENAI_API_KEY` | Alt* | Direct OpenAI API key |
+| `SLACK_BOT_TOKEN` | Yes | Slack bot OAuth token (`xoxb-...`) |
+| `SLACK_SIGNING_SECRET` | Yes | Slack webhook signature secret |
+| `REDIS_URL` | Yes | Redis URL for thread state |
+
+## Docs (`apps/docs`)
+
+The docs app has no required environment variables.
+
+## Setting Up
+
+### Local Development
+
+Copy the example files and fill in values:
+
+```bash
+cp apps/web/env.example apps/web/.env.local
+cp apps/bot/env.example apps/bot/.env.local
+```
+
+### Production (Vercel)
+
+Add variables in the Vercel dashboard under **Settings > Environment Variables**. Variables are automatically available to the corresponding app based on root directory configuration.
+
+### Turborepo Global Env
+
+The following variables are declared in `turbo.json` as `globalEnv` to ensure proper cache invalidation when they change:
+
+```
+DATABASE_URL, AUTH_SECRET, AI_GATEWAY_API_KEY, OPENROUTER_API_KEY,
+OPENAI_API_KEY, REDIS_URL, BLOB_READ_WRITE_TOKEN, SLACK_BOT_TOKEN,
+SLACK_SIGNING_SECRET, AUTH_GITHUB_ID, AUTH_GITHUB_SECRET,
+AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, APP_URL, VERCEL_URL
+```

@@ -1,0 +1,52 @@
+---
+title: Deployment
+description: Deploy chatOS to production
+---
+
+# Deployment
+
+chatOS is designed to deploy on Vercel with minimal configuration.
+
+## Vercel Setup
+
+### Web App
+
+1. Import the repository on [vercel.com](https://vercel.com)
+2. Set the **Root Directory** to `apps/web`
+3. Framework preset will auto-detect **Next.js**
+4. Add all required [environment variables](/docs/deployment/environment)
+5. Deploy
+
+### Bot
+
+The bot runs as an Elysia.js server, so it needs a long-running process (not serverless). Options:
+
+- **Railway** — Recommended for Bun + Elysia deployments
+- **Fly.io** — Global edge deployment
+- **Docker** — Self-hosted with `bun run start`
+
+### Docs
+
+1. Import the repository on Vercel
+2. Set the **Root Directory** to `apps/docs`
+3. Framework preset: **Next.js**
+4. No environment variables needed
+5. Deploy
+
+## Build Commands
+
+All apps build from the monorepo root:
+
+```bash
+turbo build           # Build all apps
+turbo build --filter=@chatos/web   # Build web only
+turbo build --filter=@chatos/bot   # Build bot only
+turbo build --filter=@chatos/docs  # Build docs only
+```
+
+## Prerequisites
+
+- PostgreSQL database (e.g., Neon, Supabase, or self-hosted)
+- Redis instance (e.g., Upstash, Railway Redis)
+- AI Gateway API key or direct provider keys
+- OAuth app credentials (GitHub and/or Google)

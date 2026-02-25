@@ -1,0 +1,66 @@
+---
+title: Configuration
+description: Bot setup and environment variables
+---
+
+# Configuration
+
+## Environment Variables
+
+Create a `.env.local` file in `apps/bot/` with:
+
+```bash
+# AI provider (one of these is required)
+AI_GATEWAY_API_KEY=""        # Vercel AI Gateway (recommended)
+# OPENAI_API_KEY=""          # Or direct provider key
+# ANTHROPIC_API_KEY=""
+
+# Slack (required for Slack integration)
+SLACK_BOT_TOKEN=""           # xoxb-... bot token
+SLACK_SIGNING_SECRET=""      # Webhook signature verification
+
+# Redis (required for thread state)
+REDIS_URL=""                 # e.g., redis://localhost:6379
+```
+
+## Slack Setup
+
+### 1. Create a Slack App
+
+1. Go to [api.slack.com/apps](https://api.slack.com/apps) and create a new app
+2. Under **OAuth & Permissions**, add these bot token scopes:
+   - `chat:write` — Send messages
+   - `app_mentions:read` — Detect @mentions
+   - `channels:history` — Read channel messages
+   - `groups:history` — Read private channel messages
+
+### 2. Configure Event Subscriptions
+
+1. Under **Event Subscriptions**, enable events
+2. Set the Request URL to your bot's webhook endpoint:
+   - Local: `https://your-ngrok-url.ngrok.io/webhooks/slack`
+   - Production: `https://your-domain.com/webhooks/slack`
+3. Subscribe to bot events:
+   - `app_mention`
+   - `message.channels`
+   - `message.groups`
+
+### 3. Install and Get Tokens
+
+1. Install the app to your workspace
+2. Copy the **Bot User OAuth Token** (`xoxb-...`) → `SLACK_BOT_TOKEN`
+3. Under **Basic Information**, copy the **Signing Secret** → `SLACK_SIGNING_SECRET`
+
+## Local Development with ngrok
+
+Since Slack needs a public URL for webhooks:
+
+```bash
+# Terminal 1: Start the bot
+cd apps/bot && bun run dev
+
+# Terminal 2: Expose via ngrok
+ngrok http 3001
+```
+
+Copy the ngrok HTTPS URL and set it as the Slack Event Subscriptions Request URL.

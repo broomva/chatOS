@@ -16,6 +16,7 @@
     "lint": "biome check --diagnostic-level=error ."
   },
   "dependencies": {
+    "@chatos/types": "workspace:*",
     "ai": "^6.0.37",
     "@ai-sdk/gateway": "^3.0.15",
     "@ai-sdk/react": "^3.0.39",

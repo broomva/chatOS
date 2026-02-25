@@ -1,0 +1,80 @@
+---
+title: Streaming
+description: SSE streaming protocol and AI SDK integration
+---
+
+# Streaming
+
+chatOS uses the **Vercel AI SDK UI message stream protocol** for real-time streaming responses.
+
+## Protocol
+
+The `/api/chat` endpoint returns a `text/event-stream` response. Each Server-Sent Event contains a JSON-encoded stream part.
+
+### Stream Part Types
+
+| Type | Description |
+|---|---|
+| `text-delta` | Incremental text content |
+| `tool-call` | Model invokes a tool |
+| `tool-result` | Tool execution result |
+| `reasoning` | Reasoning/thinking content (for reasoning models) |
+| `source` | Source citation |
+| `finish` | Stream completion with usage stats |
+| `error` | Error during generation |
+
+### Example Stream
+
+```
+data: {"type":"text-delta","textDelta":"The weather"}
+data: {"type":"text-delta","textDelta":" in Paris is"}
+data: {"type":"tool-call","toolCallId":"tc_1","toolName":"getWeather","args":{"latitude":48.85,"longitude":2.35}}
+data: {"type":"tool-result","toolCallId":"tc_1","result":{"temperature":18,"unit":"celsius"}}
+data: {"type":"text-delta","textDelta":" 18°C."}
+data: {"type":"finish","finishReason":"stop","usage":{"promptTokens":45,"completionTokens":20}}
+```
+
+## Client Integration
+
+The web app uses the AI SDK React hooks for consuming streams:
+
+```tsx
+import { useChat } from "@ai-sdk/react";
+
+function ChatComponent() {
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat",
+    body: { selectedModel: "anthropic/claude-sonnet-4.5" },
+  });
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {messages.map((m) => (
+        <div key={m.id}>{m.content}</div>
+      ))}
+      <input value={input} onChange={handleInputChange} />
+    </form>
+  );
+}
+```
+
+## Resumable Streams
+
+chatOS supports resumable streams via Redis. If a client disconnects and reconnects, the stream can be resumed from where it left off.
+
+This is configured in `packages/ai/src/streaming.ts` and uses the `resumable-stream` package.
+
+## Server Implementation
+
+On the server, `streamText` from the AI SDK generates the response and `toUIMessageStreamResponse()` converts it to the SSE format:
+
+```typescript
+const result = streamText({
+  model: gateway(modelId),
+  system: systemPrompt({ selectedChatModel: modelId }),
+  messages,
+  tools: { getWeather: weatherTool },
+});
+
+return result.toUIMessageStreamResponse();
+```

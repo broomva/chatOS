@@ -1,0 +1,62 @@
+---
+title: Platforms
+description: Supported messaging platforms
+---
+
+# Platforms
+
+The bot uses the [Chat SDK](https://www.npmjs.com/package/chat) adapter pattern, making it straightforward to support multiple platforms.
+
+## Slack
+
+**Status**: Supported
+
+The Slack adapter handles:
+- Webhook signature verification
+- Event parsing (mentions, messages, reactions)
+- Thread management and subscriptions
+- Streaming message delivery
+- URL verification challenges
+
+See [Configuration](/docs/bot/configuration) for setup instructions.
+
+## Future Platforms
+
+The Chat SDK supports additional platforms that can be added:
+
+### Discord
+
+```typescript
+import { createDiscordAdapter } from "@chat-adapter/discord";
+
+const bot = new Chat({
+  adapters: {
+    slack: createSlackAdapter(),
+    discord: createDiscordAdapter(),
+  },
+});
+```
+
+### Microsoft Teams
+
+```typescript
+import { createTeamsAdapter } from "@chat-adapter/teams";
+
+const bot = new Chat({
+  adapters: {
+    slack: createSlackAdapter(),
+    teams: createTeamsAdapter(),
+  },
+});
+```
+
+## Adding a New Platform
+
+To add a platform:
+
+1. Install the Chat SDK adapter package for the platform
+2. Add the adapter to the `Chat` constructor in `src/bot.ts`
+3. Create a new route in `src/routes/` for the platform's webhook
+4. Configure the platform to send events to the new webhook URL
+
+Each platform adapter handles its own authentication, event format parsing, and message delivery. The core bot logic (AI response generation) is shared across all platforms.

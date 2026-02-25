@@ -1,0 +1,76 @@
+---
+title: Quick Start
+description: Get chatOS running locally in minutes
+---
+
+# Quick Start
+
+## Prerequisites
+
+- [Bun](https://bun.sh) v1.1+
+- [PostgreSQL](https://www.postgresql.org/) (or use a hosted provider like Neon)
+- A [Vercel AI Gateway](https://sdk.vercel.ai/docs/ai-sdk-core/settings#ai-gateway) API key (or direct provider keys)
+
+## 1. Clone and Install
+
+```bash
+git clone <your-repo-url> chatOS
+cd chatOS
+bun install
+```
+
+## 2. Configure Environment
+
+Each app has an `env.example` file. Copy and fill in the values:
+
+```bash
+# Web app
+cp apps/web/env.example apps/web/.env.local
+
+# Bot
+cp apps/bot/env.example apps/bot/.env.local
+
+# Docs (no secrets required)
+```
+
+See [Environment Variables](/docs/deployment/environment) for a complete reference.
+
+## 3. Set Up the Database
+
+```bash
+turbo db:generate
+turbo db:migrate
+```
+
+## 4. Start Development
+
+```bash
+turbo dev
+```
+
+This starts all three apps:
+
+| App | URL |
+|---|---|
+| Web (chat) | [localhost:3000](http://localhost:3000) |
+| Bot | [localhost:3001](http://localhost:3001) |
+| Docs | [localhost:3002](http://localhost:3002) |
+
+## 5. Verify
+
+- Open [localhost:3000](http://localhost:3000) — you should see the chat interface
+- Open [localhost:3001/health](http://localhost:3001/health) — should return `{"status":"ok"}`
+- Open [localhost:3002](http://localhost:3002) — you're reading these docs!
+
+## Available Commands
+
+| Command | Purpose |
+|---|---|
+| `bun install` | Install all dependencies |
+| `turbo build` | Build all apps and packages |
+| `turbo dev` | Start all apps in development mode |
+| `turbo lint` | Lint all packages with Biome |
+| `turbo check-types` | TypeScript type checking |
+| `make smoke` | Quick build sanity check |
+| `make check` | Full lint + typecheck |
+| `make test` | Complete test suite |

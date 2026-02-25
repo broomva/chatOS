@@ -24,3 +24,11 @@ metrics:
     description: Fraction of tasks requiring human escalation
     target: 0.1
     source: task_logs
+  - id: agent_session_count
+    description: Total agent sessions across platforms
+    target: null
+    source: agent_state_store
+  - id: agent_error_rate
+    description: Fraction of observations that are errors
+    target: 0.05
+    source: agent_state_store

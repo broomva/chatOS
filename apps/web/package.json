@@ -15,6 +15,7 @@
     "@chatos/ai": "workspace:*",
     "@chatos/auth": "workspace:*",
     "@chatos/db": "workspace:*",
+    "@chatos/state": "workspace:*",
     "@chatos/types": "workspace:*",
     "@chatos/ui": "workspace:*",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -42,6 +43,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@scalar/nextjs-api-reference": "^0.9.23",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^22.8.6",
     "@types/react": "^18",

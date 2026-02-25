@@ -1,0 +1,80 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "chatOS Bot API",
+    "version": "0.1.0",
+    "description": "Multi-platform AI bot service. Receives webhook events from messaging platforms and responds using AI models via the Vercel AI Gateway."
+  },
+  "tags": [
+    { "name": "Webhooks", "description": "Platform webhook endpoints" },
+    { "name": "Health", "description": "Service health and status" }
+  ],
+  "paths": {
+    "/webhooks/slack": {
+      "post": {
+        "operationId": "slackWebhook",
+        "tags": ["Webhooks"],
+        "summary": "Slack event webhook",
+        "description": "Receives Slack events (messages, mentions, reactions) and processes them through the Chat SDK. Slack sends verification challenges and event payloads to this endpoint.",
+        "responses": {
+          "200": { "description": "Event processed successfully" },
+          "401": { "description": "Invalid Slack signature" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns 200 if the bot service is running.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "const": "ok" }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "operationId": "serviceStatus",
+        "tags": ["Health"],
+        "summary": "Service status",
+        "description": "Returns detailed service status including uptime and supported platforms.",
+        "responses": {
+          "200": {
+            "description": "Service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": { "type": "string" },
+                    "version": { "type": "string" },
+                    "uptime": { "type": "number" },
+                    "platforms": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  },
+                  "required": ["service", "version", "uptime", "platforms"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

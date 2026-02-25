@@ -1,0 +1,50 @@
+---
+title: Packages
+description: Shared internal packages
+---
+
+# Packages
+
+chatOS uses six internal packages shared between applications. All packages live in the `packages/` directory and are referenced as workspace dependencies.
+
+## Package Map
+
+| Package | Path | Description |
+|---|---|---|
+| [@chatos/ai](/docs/packages/ai) | `packages/ai` | AI models, tools, prompts, streaming |
+| [@chatos/db](/docs/packages/db) | `packages/db` | Drizzle ORM schema and queries |
+| [@chatos/auth](/docs/packages/auth) | `packages/auth` | Better Auth configuration |
+| [@chatos/types](/docs/packages/types) | `packages/types` | Shared TypeScript types |
+| [@chatos/ui](/docs/packages/ui) | `packages/ui` | shadcn/ui components |
+| @chatos/config | `packages/config` | tsconfig, Biome, Tailwind presets |
+
+## Dependency Graph
+
+```
+@chatos/config, @chatos/types   (leaf — no deps)
+  → @chatos/db     (config, types)
+  → @chatos/auth   (config, types, db)
+  → @chatos/ai     (config, types)
+  → @chatos/ui     (config, types)
+```
+
+## Usage
+
+All packages are referenced using workspace protocol:
+
+```json
+{
+  "dependencies": {
+    "@chatos/ai": "workspace:*",
+    "@chatos/types": "workspace:*"
+  }
+}
+```
+
+Import from the package name directly:
+
+```typescript
+import { chatModels, DEFAULT_CHAT_MODEL } from "@chatos/ai/models";
+import { weatherTool } from "@chatos/ai";
+import type { Message, ChatModel } from "@chatos/types";
+```

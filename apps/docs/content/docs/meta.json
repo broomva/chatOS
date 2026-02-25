@@ -1,0 +1,14 @@
+{
+  "title": "chatOS",
+  "pages": [
+    "index",
+    "quickstart",
+    "architecture",
+    "...",
+    "web",
+    "bot",
+    "packages",
+    "...",
+    "deployment"
+  ]
+}

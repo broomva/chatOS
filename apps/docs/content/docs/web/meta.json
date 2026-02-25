@@ -1,0 +1,4 @@
+{
+  "title": "Web App",
+  "pages": ["index", "chat-api", "models", "tools", "streaming"]
+}

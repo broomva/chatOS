@@ -1,0 +1,49 @@
+---
+title: Bot
+description: Multi-platform AI bot service
+---
+
+# Bot
+
+The bot app (`apps/bot`) is an Elysia.js server that receives webhook events from messaging platforms and responds using AI models.
+
+## Architecture
+
+The bot uses the [Chat SDK](https://www.npmjs.com/package/chat) to handle platform-specific webhook parsing, signature verification, thread management, and message delivery. The AI response generation uses the same `@chatos/ai` package as the web app.
+
+```
+Slack Event → POST /webhooks/slack → Chat SDK → AI Gateway → Stream Response → Slack Thread
+```
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/webhooks/slack` | POST | Slack event webhook |
+| `/health` | GET | Health check |
+| `/status` | GET | Detailed service status |
+| `/openapi` | GET | OpenAPI documentation (Scalar UI) |
+| `/openapi/json` | GET | Raw OpenAPI spec |
+
+## Running
+
+```bash
+cd apps/bot
+bun run dev    # localhost:3001
+```
+
+## How It Works
+
+1. **Mentions**: When someone @mentions the bot, it subscribes to the thread and responds
+2. **Thread replies**: Once subscribed, the bot responds to every new message in that thread
+3. **Streaming**: Responses stream in real-time to the platform using the Chat SDK adapters
+4. **State**: Thread subscriptions and lock state are managed via Redis
+
+## Event Handlers
+
+The bot registers two event handlers:
+
+- **`onNewMention`**: Triggered when the bot is mentioned. Subscribes to the thread and generates a response.
+- **`onSubscribedMessage`**: Triggered for any message in a subscribed thread. Generates a response in context.
+
+Both handlers use `streamText` from the AI SDK with the default model (`anthropic/claude-sonnet-4.5`).

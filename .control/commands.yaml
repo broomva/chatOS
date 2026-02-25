@@ -25,6 +25,10 @@ commands:
     preconditions:
       - build_passed
     on_failure: diagnose_and_retry
+  - id: agent-status
+    command: bash scripts/control/agent-status.sh
+    preconditions: []
+    on_failure: fix_environment
   - id: control-audit
     command: make control-audit
     preconditions: []

@@ -1,0 +1,77 @@
+---
+title: Architecture
+description: System architecture and data flow
+---
+
+# Architecture
+
+chatOS is a Turborepo monorepo with three applications sharing six internal packages.
+
+## System Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      User / Client                       │
+└────────────┬────────────────────────────┬───────────────┘
+             │                            │
+             ▼                            ▼
+┌────────────────────┐       ┌────────────────────────┐
+│   apps/web (:3000) │       │   apps/bot (:3001)     │
+│   Next.js 16       │       │   Elysia.js            │
+│                    │       │                        │
+│  /api/chat (SSE)   │       │  /webhooks/slack       │
+│  /api/reference    │       │  /health, /status      │
+│  Chat UI           │       │  /openapi              │
+└──────┬─────────────┘       └──────┬─────────────────┘
+       │                            │
+       │    ┌───────────────────┐   │
+       ├───▶│  @chatos/ai       │◀──┤
+       │    │  Models, Tools,   │   │
+       │    │  Prompts          │   │
+       │    └───────┬───────────┘   │
+       │            │               │
+       │            ▼               │
+       │    ┌───────────────────┐   │
+       │    │  AI Gateway       │   │
+       │    │  (Multi-Provider) │   │
+       │    └───────────────────┘   │
+       │                            │
+       ▼                            │
+┌──────────────┐  ┌──────────────┐  │
+│ @chatos/db   │  │ @chatos/auth │  │
+│ Drizzle ORM  │  │ Better Auth  │  │
+└──────┬───────┘  └──────────────┘  │
+       │                            │
+       ▼                            │
+┌──────────────┐  ┌──────────────┐  │
+│  PostgreSQL  │  │    Redis     │◀─┘
+└──────────────┘  └──────────────┘
+```
+
+## Web App Flow
+
+1. User sends a message through the chat UI
+2. `POST /api/chat` receives the message history and selected model
+3. The AI SDK calls the AI Gateway, which routes to the appropriate provider (Anthropic, OpenAI, Google, xAI)
+4. The response streams back as Server-Sent Events using the AI SDK UI message stream protocol
+5. Tool calls (weather, document operations) are executed server-side and results streamed back
+6. Messages and chat metadata are persisted to PostgreSQL via Drizzle ORM
+
+## Bot Flow
+
+1. Platform (Slack) sends an event webhook to `POST /webhooks/slack`
+2. The Chat SDK verifies the webhook signature and parses the event
+3. On mentions or subscribed thread messages, the bot generates an AI response
+4. The response streams back to the platform thread via the Chat SDK adapter
+5. Thread state and subscriptions are managed via Redis
+
+## Package Responsibilities
+
+| Package | Role |
+|---|---|
+| `@chatos/ai` | Model registry (9 models across 4 providers), tool definitions, system prompts, streaming config |
+| `@chatos/db` | PostgreSQL schema (users, chats, messages, documents, votes), Drizzle queries |
+| `@chatos/auth` | Better Auth setup with GitHub and Google OAuth providers |
+| `@chatos/types` | Shared TypeScript types for messages, documents, models, streams, bot events |
+| `@chatos/ui` | shadcn/ui components shared between web and docs |
+| `@chatos/config` | TypeScript configs, Biome config, Tailwind presets |

@@ -1,0 +1,49 @@
+---
+title: "@chatos/db"
+description: Drizzle ORM schema and database queries
+---
+
+# @chatos/db
+
+Database schema and queries using Drizzle ORM with PostgreSQL.
+
+## Schema
+
+The database schema is defined in `packages/db/src/schema.ts` and includes:
+
+| Table | Description |
+|---|---|
+| `user` | User accounts (id, email, name, image) |
+| `session` | Auth sessions |
+| `chat` | Chat conversations (title, visibility, userId) |
+| `message` | Chat messages (role, parts, attachments) |
+| `document` | Document artifacts (title, content, kind) |
+| `vote` | Message votes (upvote/downvote) |
+
+## Usage
+
+```typescript
+import { db, schema } from "@chatos/db";
+
+// Query
+const chats = await db.select().from(schema.chat).where(eq(schema.chat.userId, userId));
+
+// Insert
+await db.insert(schema.message).values({
+  chatId,
+  role: "user",
+  parts: [{ type: "text", text: "Hello" }],
+  attachments: [],
+});
+```
+
+## Migrations
+
+```bash
+turbo db:generate   # Generate migration from schema changes
+turbo db:migrate    # Apply pending migrations
+```
+
+## Connection
+
+Requires the `DATABASE_URL` environment variable pointing to a PostgreSQL database.

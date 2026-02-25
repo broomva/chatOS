@@ -25,6 +25,42 @@ All API routes and streaming handlers must include:
 | `build.completed` | turbo | Build pipeline done |
 | `test.completed` | turbo | Test pipeline done |
 
+## Runtime Observations (Agent State Layer)
+
+The `@chatos/state` package records observations to the `.agent/observations/` directory. Each observation is a JSON file with:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique observation ID |
+| `agentId` | string | Agent that produced the observation |
+| `sessionId` | string? | Associated session (if any) |
+| `type` | enum | `metric`, `event`, `error`, `decision` |
+| `name` | string | Observation name (e.g. `chat.response`) |
+| `value` | object | Arbitrary payload |
+| `timestamp` | ISO 8601 | When the observation was recorded |
+
+### Agent Metrics (via `collectMetrics`)
+
+| Metric | Description |
+|---|---|
+| `totalSessions` | Total sessions across all platforms |
+| `activeSessions` | Sessions in `active` mode |
+| `totalMessages` | Total messages across all sessions |
+| `errorCount` | Observations of type `error` |
+| `platformBreakdown` | Session count per platform |
+
+Collect metrics programmatically:
+```ts
+import { collectMetrics, AgentStateStore, LocalStorageBackend } from "@chatos/state";
+const store = new AgentStateStore(new LocalStorageBackend(".agent"));
+const metrics = await collectMetrics(store);
+```
+
+Or via shell:
+```bash
+bash scripts/control/agent-status.sh .agent
+```
+
 ## Integrations
 
 - **Langfuse** (optional): LLM tracing, cost tracking, prompt management

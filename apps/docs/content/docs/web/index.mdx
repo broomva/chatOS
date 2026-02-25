@@ -1,0 +1,35 @@
+---
+title: Web App
+description: Next.js AI chat application
+---
+
+# Web App
+
+The web app (`apps/web`) is a full-featured AI chat application built with Next.js 16 and the Vercel AI SDK.
+
+## Features
+
+- **Multi-model chat**: Choose from 9 AI models across Anthropic, OpenAI, Google, and xAI
+- **Streaming responses**: Real-time SSE streaming with the AI SDK UI message stream protocol
+- **Tool use**: Weather lookups, document creation/editing, and suggestion requests
+- **Artifacts**: Side-by-side document editing with real-time preview
+- **Authentication**: GitHub and Google OAuth via Better Auth
+- **Persistence**: Chat history, messages, and documents stored in PostgreSQL
+- **Resumable streams**: Redis-backed stream resumption for reliability
+- **Dark mode**: Full theme support via next-themes
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/chat` | POST | Stream a chat completion |
+| `/api/reference` | GET | Interactive API docs (Scalar) |
+
+## Running
+
+```bash
+cd apps/web
+bun run dev    # localhost:3000
+```
+
+See the [Chat API](/docs/web/chat-api) page for detailed endpoint documentation.
