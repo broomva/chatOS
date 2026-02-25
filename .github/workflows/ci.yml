@@ -15,7 +15,7 @@ jobs:
     name: Lint, Type-check, Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -37,7 +37,7 @@ jobs:
     name: Control Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run control audit
         run: bash scripts/control/audit.sh
