@@ -1,0 +1,43 @@
+version: 1
+structure:
+  apps:
+    - name: web
+      type: next-app
+      port: 3000
+      depends_on: [ui, db, ai, auth]
+    - name: bot
+      type: next-app
+      port: 3001
+      depends_on: [ai, db, auth]
+    - name: docs
+      type: next-app
+      port: 3002
+      depends_on: [config, ui]
+  packages:
+    - name: config
+      type: shared-config
+      depends_on: []
+    - name: types
+      type: shared-types
+      depends_on: []
+    - name: db
+      type: library
+      depends_on: [config, types]
+    - name: auth
+      type: library
+      depends_on: [config, types, db]
+    - name: ai
+      type: library
+      depends_on: [config, types]
+    - name: ui
+      type: component-library
+      depends_on: [config, types]
+toolchain:
+  package_manager: bun
+  build_system: turborepo
+  linter: biome
+  formatter: biome
+  test_runner: vitest
+  e2e_runner: playwright
+  database: postgresql
+  orm: drizzle

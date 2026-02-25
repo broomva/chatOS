@@ -1,0 +1,31 @@
+version: 1
+commands:
+  - id: smoke
+    command: make smoke
+    preconditions:
+      - dependencies_installed
+    on_failure: fix_environment
+  - id: check
+    command: make check
+    preconditions:
+      - smoke_passed
+    on_failure: fix_static_issues
+  - id: test
+    command: make test
+    preconditions:
+      - check_passed
+    on_failure: diagnose_and_retry
+  - id: recover
+    command: make recover
+    preconditions:
+      - failure_detected
+    on_failure: escalate_human
+  - id: web-e2e
+    command: make web-e2e
+    preconditions:
+      - build_passed
+    on_failure: diagnose_and_retry
+  - id: control-audit
+    command: make control-audit
+    preconditions: []
+    on_failure: fix_governance_gaps

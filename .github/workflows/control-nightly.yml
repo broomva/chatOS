@@ -1,0 +1,29 @@
+name: Control Nightly
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Daily at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    name: Entropy Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Full build
+        run: bunx turbo run build
+
+      - name: Control audit
+        run: bash scripts/control/audit.sh
+
+      - name: Check for stale deps
+        run: bunx npm-check-updates --errorLevel 2 || true

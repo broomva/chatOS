@@ -1,0 +1,53 @@
+# chatOS Control Makefile
+# Stable command surface for agent-driven development
+
+.PHONY: smoke check test web-e2e hooks-install recover control-audit format
+
+# ─── Gates ───────────────────────────────────────────
+
+smoke:
+	@echo "=== SMOKE: env + build sanity ==="
+	@command -v bun >/dev/null 2>&1 || { echo "ERROR: bun not found"; exit 1; }
+	@command -v turbo >/dev/null 2>&1 || { echo "ERROR: turbo not found"; exit 1; }
+	@test -f package.json || { echo "ERROR: not in repo root"; exit 1; }
+	@bun install --frozen-lockfile 2>/dev/null || bun install
+	@echo "smoke passed"
+
+check: smoke
+	@echo "=== CHECK: lint + typecheck ==="
+	@turbo run lint --no-daemon 2>&1
+	@turbo run check-types --no-daemon 2>&1
+	@echo "check passed"
+
+test: check
+	@echo "=== TEST: full verification ==="
+	@turbo run test --no-daemon 2>&1
+	@echo "test passed"
+
+# ─── E2E ─────────────────────────────────────────────
+
+web-e2e:
+	@echo "=== WEB E2E ==="
+	@turbo run test:e2e --filter=@chatos/web --no-daemon 2>&1
+
+# ─── Format ──────────────────────────────────────────
+
+format:
+	@echo "=== FORMAT ==="
+	@bunx biome format --write .
+
+# ─── Hooks ───────────────────────────────────────────
+
+hooks-install:
+	@bash scripts/control/install_hooks.sh
+
+# ─── Recovery ────────────────────────────────────────
+
+recover:
+	@echo "=== RECOVER ==="
+	@bash scripts/control/recover.sh
+
+# ─── Audit ───────────────────────────────────────────
+
+control-audit:
+	@bash scripts/control/audit.sh

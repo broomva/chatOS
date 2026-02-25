@@ -1,0 +1,26 @@
+version: 1
+metrics:
+  - id: pass_at_1
+    description: Primary build/test success rate
+    target: 1.0
+    source: turbo_build_exit_code
+  - id: retry_rate
+    description: Fraction of tasks requiring retry
+    target: 0.0
+    source: ci_workflow_logs
+  - id: time_to_actionable_failure
+    description: Seconds from push to first failure signal
+    target: 60
+    source: ci_workflow_duration
+  - id: merge_cycle_time
+    description: Minutes from PR open to merge
+    target: 30
+    source: github_pr_metrics
+  - id: revert_rate
+    description: Fraction of commits reverted
+    target: 0.0
+    source: git_log
+  - id: human_intervention_rate
+    description: Fraction of tasks requiring human escalation
+    target: 0.1
+    source: task_logs

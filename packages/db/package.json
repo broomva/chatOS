@@ -1,0 +1,30 @@
+{
+  "name": "@chatos/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts",
+    "./queries": "./src/queries.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push",
+    "check-types": "tsc --noEmit",
+    "lint": "biome check --diagnostic-level=error ."
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.34.0",
+    "postgres": "^3.4.4",
+    "@neondatabase/serverless": "^0.10.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.25.0",
+    "typescript": "^5.8.3",
+    "dotenv": "^16.4.5"
+  }
+}
