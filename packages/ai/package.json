@@ -9,7 +9,9 @@
     "./models": "./src/models.ts",
     "./tools": "./src/tools/index.ts",
     "./prompts": "./src/prompts.ts",
-    "./streaming": "./src/streaming.ts"
+    "./streaming": "./src/streaming.ts",
+    "./events": "./src/events.ts",
+    "./queue": "./src/queue.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

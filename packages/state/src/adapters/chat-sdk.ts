@@ -53,8 +53,17 @@ export class AgentStateAdapter implements StateAdapter {
 
   async connect(): Promise<void> {
     if (this.redisUrl) {
-      this.redis = createClient({ url: this.redisUrl }) as RedisClientType;
-      await this.redis.connect();
+      try {
+        this.redis = createClient({
+          url: this.redisUrl,
+          socket: { connectTimeout: 3000, reconnectStrategy: false },
+        }) as RedisClientType;
+        this.redis.on("error", () => {}); // Suppress unhandled error events
+        await this.redis.connect();
+      } catch {
+        console.warn("[state] Redis unavailable, falling back to local-only mode");
+        this.redis = null;
+      }
     }
   }
 

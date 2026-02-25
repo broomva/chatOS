@@ -13,6 +13,9 @@ structure:
       type: next-app
       port: 3002
       depends_on: [config, ui]
+    - name: tui
+      type: cli-app
+      depends_on: [ai, state, types]
   packages:
     - name: config
       type: shared-config

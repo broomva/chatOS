@@ -5,8 +5,7 @@ export const slackRoutes = new Elysia({ prefix: "/webhooks" }).post(
   "/slack",
   async (context) => {
     const bot = getBot();
-    // Chat SDK's webhooks.slack() takes standard Web Request/Response
-    // We skip Elysia body parsing to let the SDK handle raw verification
+    // Pass the raw request so the Chat SDK can verify Slack signatures
     const response = await bot.webhooks.slack(context.request, {
       waitUntil: (task) => {
         // Bun is long-running, fire-and-forget is fine
@@ -16,6 +15,9 @@ export const slackRoutes = new Elysia({ prefix: "/webhooks" }).post(
     return response;
   },
   {
+    // Prevent Elysia from consuming the body — Chat SDK needs the raw stream
+    // for HMAC signature verification
+    type: "none",
     detail: {
       tags: ["Webhooks"],
       summary: "Slack event webhook",
