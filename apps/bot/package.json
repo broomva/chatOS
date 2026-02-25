@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.15",
+    "@chat-adapter/slack": "^4.14.0",
+    "@chat-adapter/state-memory": "^4.14.0",
+    "@chat-adapter/state-redis": "^4.14.0",
     "@chatos/ai": "workspace:*",
     "@chatos/types": "workspace:*",
     "ai": "^6.0.37",
+    "chat": "^4.14.0",
     "next": "^16.0.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

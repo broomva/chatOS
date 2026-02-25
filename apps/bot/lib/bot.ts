@@ -1,33 +1,46 @@
 import { gateway } from "@ai-sdk/gateway";
+import { createSlackAdapter, type SlackAdapter } from "@chat-adapter/slack";
+import { createRedisState } from "@chat-adapter/state-redis";
 import { DEFAULT_CHAT_MODEL, systemPrompt } from "@chatos/ai";
-import { generateText, streamText } from "ai";
+import { streamText } from "ai";
+import { Chat } from "chat";
 
-export type BotMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
+type BotAdapters = { slack: SlackAdapter };
 
-export async function generateBotResponse(messages: BotMessage[], modelId?: string) {
-  const model = modelId || DEFAULT_CHAT_MODEL;
+let _bot: Chat<BotAdapters> | null = null;
 
-  const { text } = await generateText({
-    model: gateway(model),
-    system: systemPrompt({ selectedChatModel: model }),
-    messages,
-  });
+export function getBot(): Chat<BotAdapters> {
+  if (!_bot) {
+    _bot = new Chat<BotAdapters>({
+      userName: "chatos",
+      adapters: {
+        slack: createSlackAdapter(),
+      },
+      state: createRedisState(),
+    });
 
-  return text;
-}
+    _bot.onNewMention(async (thread, message) => {
+      await thread.subscribe();
 
-export function streamBotResponse(
-  messages: BotMessage[],
-  modelId?: string,
-): ReturnType<typeof streamText> {
-  const model = modelId || DEFAULT_CHAT_MODEL;
+      const result = streamText({
+        model: gateway(DEFAULT_CHAT_MODEL),
+        system: systemPrompt({ selectedChatModel: DEFAULT_CHAT_MODEL }),
+        prompt: message.text,
+      });
 
-  return streamText({
-    model: gateway(model),
-    system: systemPrompt({ selectedChatModel: model }),
-    messages,
-  });
+      await thread.post(result.textStream);
+    });
+
+    _bot.onSubscribedMessage(async (thread, message) => {
+      const result = streamText({
+        model: gateway(DEFAULT_CHAT_MODEL),
+        system: systemPrompt({ selectedChatModel: DEFAULT_CHAT_MODEL }),
+        prompt: message.text,
+      });
+
+      await thread.post(result.textStream);
+    });
+  }
+
+  return _bot;
 }
