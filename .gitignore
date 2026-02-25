@@ -45,3 +45,6 @@ yarn-error.log*
 
 # Control state (runtime, not committed)
 .control/state.json
+
+
+.agent/
