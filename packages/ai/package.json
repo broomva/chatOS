@@ -11,13 +11,15 @@
     "./prompts": "./src/prompts.ts",
     "./streaming": "./src/streaming.ts",
     "./events": "./src/events.ts",
-    "./queue": "./src/queue.ts"
+    "./queue": "./src/queue.ts",
+    "./persist": "./src/persist.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "biome check --diagnostic-level=error ."
   },
   "dependencies": {
+    "@chatos/state": "workspace:*",
     "@chatos/types": "workspace:*",
     "ai": "^6.0.37",
     "@ai-sdk/gateway": "^3.0.15",

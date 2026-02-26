@@ -28,6 +28,17 @@ export type AgentMessage = {
   attachments?: Attachment[];
   /** Platform that originated this message */
   platform?: string;
+  /** Token usage for this message (assistant messages only) */
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    reasoningTokens?: number;
+  };
+  /** Why the model stopped generating */
+  finishReason?: string;
+  /** Model ID used to generate this message */
+  model?: string;
   createdAt: string; // ISO 8601
 };
 

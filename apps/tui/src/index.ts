@@ -1,11 +1,10 @@
-import { AgentStateStore, LocalStorageBackend } from "@chatos/state";
+import { AgentStateStore, LocalStorageBackend, resolveStateDir } from "@chatos/state";
 import { ProcessTerminal } from "@mariozechner/pi-tui";
 import { ChatApp } from "./app";
 
-const stateDir = process.env.AGENT_STATE_DIR ?? ".agent";
 const sessionId = process.argv[2] ?? undefined;
 
-const backend = new LocalStorageBackend(stateDir);
+const backend = new LocalStorageBackend(resolveStateDir());
 const store = new AgentStateStore(backend);
 
 const terminal = new ProcessTerminal();

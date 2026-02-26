@@ -1,9 +1,14 @@
 import { gateway } from "@ai-sdk/gateway";
 import { createSlackAdapter, type SlackAdapter } from "@chat-adapter/slack";
-import { DEFAULT_CHAT_MODEL, systemPrompt } from "@chatos/ai";
-import { AgentStateAdapter, AgentStateStore, LocalStorageBackend } from "@chatos/state";
+import { DEFAULT_CHAT_MODEL, persistStreamResult, systemPrompt, weatherTool } from "@chatos/ai";
+import {
+  AgentStateAdapter,
+  AgentStateStore,
+  LocalStorageBackend,
+  resolveStateDir,
+} from "@chatos/state";
 import type { AgentMessage, MessagePart } from "@chatos/types";
-import { streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import { Chat } from "chat";
 
 type BotAdapters = { slack: SlackAdapter };
@@ -12,8 +17,7 @@ const AGENT_ID = "chatos-bot";
 
 // ─── State layer ─────────────────────────────────────
 
-const stateDir = process.env.AGENT_STATE_DIR ?? ".agent";
-const backend = new LocalStorageBackend(stateDir);
+const backend = new LocalStorageBackend(resolveStateDir());
 const store = new AgentStateStore(backend);
 const stateAdapter = new AgentStateAdapter({
   store,
@@ -58,6 +62,8 @@ async function handleMessage(
     model: gateway(DEFAULT_CHAT_MODEL),
     system: systemPrompt({ selectedChatModel: DEFAULT_CHAT_MODEL }),
     messages,
+    tools: { getWeather: weatherTool },
+    stopWhen: stepCountIs(5),
   });
 
   // Stream response to thread while collecting the full text
@@ -71,31 +77,26 @@ async function handleMessage(
 
   await thread.post(collectAndStream());
 
-  // Persist the assistant response
-  await store.appendMessage(session.id, {
-    sessionId: session.id,
-    role: "assistant",
-    parts: [{ type: "text", text: fullText }],
-    platform: "slack",
-  });
+  // Persist the assistant response with rich parts + metadata
+  await persistStreamResult(
+    {
+      store,
+      sessionId: session.id,
+      agentId: AGENT_ID,
+      platform: "slack",
+      model: DEFAULT_CHAT_MODEL,
+    },
+    {
+      text: fullText,
+      steps: await result.steps,
+      finishReason: await result.finishReason,
+      usage: await result.usage,
+    },
+  );
 
   // Update session timestamp
   await store.updateSession(session.id, {
     title: session.title ?? message.text.slice(0, 50),
-  });
-
-  // Record observation
-  await store.record({
-    agentId: AGENT_ID,
-    sessionId: session.id,
-    type: "event",
-    name: "chat.response",
-    value: {
-      platform: "slack",
-      model: DEFAULT_CHAT_MODEL,
-      messageCount: history.length + 2,
-      responseLength: fullText.length,
-    },
   });
 }
 

@@ -20,7 +20,8 @@
     "db:migrate": "turbo run db:migrate --filter=@chatos/db",
     "smoke": "make smoke",
     "check": "make check",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "publish:cli": "turbo run build --filter=chat-os && cd apps/tui && bun publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",

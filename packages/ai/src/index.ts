@@ -1,5 +1,6 @@
 export * from "./events";
 export * from "./models";
+export * from "./persist";
 export * from "./prompts";
 export * from "./queue";
 export * from "./streaming";

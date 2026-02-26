@@ -12,7 +12,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "lint": "biome check --diagnostic-level=error .",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@chatos/types": "workspace:*",

@@ -1,8 +1,13 @@
 import { gateway } from "@ai-sdk/gateway";
-import { systemPrompt, weatherTool } from "@chatos/ai";
+import { persistStreamResult, type StreamFinishData, systemPrompt, weatherTool } from "@chatos/ai";
 import { DEFAULT_CHAT_MODEL } from "@chatos/ai/models";
-import { AgentStateStore, LocalStorageBackend, VercelBlobBackend } from "@chatos/state";
-import { convertToModelMessages, streamText } from "ai";
+import {
+  AgentStateStore,
+  LocalStorageBackend,
+  resolveStateDir,
+  VercelBlobBackend,
+} from "@chatos/state";
+import { convertToModelMessages, stepCountIs, streamText } from "ai";
 
 export const maxDuration = 60;
 
@@ -12,7 +17,7 @@ function createStore(): AgentStateStore {
   const isVercel = !!process.env.VERCEL;
   const backend = isVercel
     ? new VercelBlobBackend(".agent/")
-    : new LocalStorageBackend(process.env.AGENT_STATE_DIR ?? ".agent");
+    : new LocalStorageBackend(resolveStateDir());
   return new AgentStateStore(backend);
 }
 
@@ -47,26 +52,18 @@ export async function POST(request: Request) {
     tools: {
       getWeather: weatherTool,
     },
-    async onFinish({ text }) {
-      if (sessionId && text) {
-        await store.appendMessage(sessionId, {
-          sessionId,
-          role: "assistant",
-          parts: [{ type: "text", text }],
-          platform: "web",
-        });
-
-        await store.record({
-          agentId: AGENT_ID,
-          sessionId,
-          type: "event",
-          name: "chat.response",
-          value: {
-            platform: "web",
-            model: modelId,
-            responseLength: text.length,
+    stopWhen: stepCountIs(5),
+    async onFinish({ text, steps, totalUsage, finishReason }) {
+      if (sessionId) {
+        await persistStreamResult(
+          { store, sessionId, agentId: AGENT_ID, platform: "web", model: modelId },
+          {
+            text,
+            steps: steps as StreamFinishData["steps"],
+            usage: totalUsage,
+            finishReason,
           },
-        });
+        );
       }
     },
   });

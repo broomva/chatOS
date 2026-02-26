@@ -1,24 +1,49 @@
 {
-  "name": "@chatos/tui",
+  "name": "chat-os",
   "version": "0.1.0",
-  "private": true,
+  "description": "AI chat in your terminal — multi-model, multi-session, shared state",
   "type": "module",
+  "bin": {
+    "chatos": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
+    "build": "bun run scripts/build.ts",
+    "prepublishOnly": "bun run build",
     "lint": "biome check --diagnostic-level=error .",
     "check-types": "tsc --noEmit"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "tui",
+    "terminal",
+    "cli",
+    "llm",
+    "agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/broomva/chatOS.git"
+  },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.15",
-    "@chatos/ai": "workspace:*",
-    "@chatos/state": "workspace:*",
-    "@chatos/types": "workspace:*",
     "@mariozechner/pi-tui": "^0.55.0",
     "ai": "^6.0.37",
     "chalk": "^5.5.0"
   },
   "devDependencies": {
+    "@chatos/ai": "workspace:*",
+    "@chatos/state": "workspace:*",
+    "@chatos/types": "workspace:*",
     "typescript": "^5.8.3"
   }
 }

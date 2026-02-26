@@ -1,4 +1,9 @@
-import { AgentStateStore, LocalStorageBackend, VercelBlobBackend } from "@chatos/state";
+import {
+  AgentStateStore,
+  LocalStorageBackend,
+  resolveStateDir,
+  VercelBlobBackend,
+} from "@chatos/state";
 import { NextResponse } from "next/server";
 
 const AGENT_ID = "chatos-web";
@@ -7,7 +12,7 @@ function createStore(): AgentStateStore {
   const isVercel = !!process.env.VERCEL;
   const backend = isVercel
     ? new VercelBlobBackend(".agent/")
-    : new LocalStorageBackend(process.env.AGENT_STATE_DIR ?? ".agent");
+    : new LocalStorageBackend(resolveStateDir());
   return new AgentStateStore(backend);
 }
 

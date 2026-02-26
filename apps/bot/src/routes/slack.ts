@@ -17,7 +17,7 @@ export const slackRoutes = new Elysia({ prefix: "/webhooks" }).post(
   {
     // Prevent Elysia from consuming the body — Chat SDK needs the raw stream
     // for HMAC signature verification
-    type: "none",
+    parse: "none",
     detail: {
       tags: ["Webhooks"],
       summary: "Slack event webhook",

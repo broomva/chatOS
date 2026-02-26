@@ -1,10 +1,10 @@
 import { gateway } from "@ai-sdk/gateway";
-import { DEFAULT_CHAT_MODEL, systemPrompt } from "@chatos/ai";
+import { DEFAULT_CHAT_MODEL, persistStreamResult, systemPrompt, weatherTool } from "@chatos/ai";
 import { AgentEventEmitter, eventTimestamp } from "@chatos/ai/events";
 import type { AgentStateStore } from "@chatos/state";
 import type { AgentMessage, MessagePart } from "@chatos/types";
 import { type OverlayHandle, type ProcessTerminal, Text, TUI } from "@mariozechner/pi-tui";
-import { streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import { HelpOverlay } from "./components/help-overlay";
 import { InputBar } from "./components/input-bar";
 import { MessageList } from "./components/message-list";
@@ -165,6 +165,8 @@ export class ChatApp {
         model: gateway(this.selectedModel),
         system: systemPrompt({ selectedChatModel: this.selectedModel }),
         messages,
+        tools: { getWeather: weatherTool },
+        stopWhen: stepCountIs(5),
       });
 
       let fullText = "";
@@ -184,26 +186,22 @@ export class ChatApp {
         timestamp: eventTimestamp(),
       });
 
-      // Persist assistant message
-      await this.store.appendMessage(this.sessionId, {
-        sessionId: this.sessionId,
-        role: "assistant",
-        parts: [{ type: "text", text: fullText }],
-        platform: "tui",
-      });
-
-      // Record observation
-      await this.store.record({
-        agentId: AGENT_ID,
-        sessionId: this.sessionId,
-        type: "event",
-        name: "chat.response",
-        value: {
+      // Persist assistant message with rich parts + metadata
+      await persistStreamResult(
+        {
+          store: this.store,
+          sessionId: this.sessionId,
+          agentId: AGENT_ID,
           platform: "tui",
           model: this.selectedModel,
-          responseLength: fullText.length,
         },
-      });
+        {
+          text: fullText,
+          steps: await result.steps,
+          finishReason: await result.finishReason,
+          usage: await result.usage,
+        },
+      );
 
       this.emitter.emit({
         type: "turn_end",
