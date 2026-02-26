@@ -18,13 +18,13 @@
     "lint": "biome check --diagnostic-level=error ."
   },
   "dependencies": {
-    "drizzle-orm": "^0.34.0",
+    "drizzle-orm": "^0.45.1",
     "postgres": "^3.4.4",
-    "@neondatabase/serverless": "^0.10.0"
+    "@neondatabase/serverless": "^1.0.2"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.25.0",
+    "drizzle-kit": "^0.31.9",
     "typescript": "^5.8.3",
-    "dotenv": "^16.4.5"
+    "dotenv": "^17.3.1"
   }
 }
