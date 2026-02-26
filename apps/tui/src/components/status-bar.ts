@@ -32,7 +32,7 @@ export class StatusBar extends Text {
   private refresh(): void {
     const modelName = this.model.split("/").pop() ?? this.model;
     const streamIndicator = this.streaming ? " [streaming...]" : "";
-    const bar = ` ${modelName} | ${this.messageCount} msgs${streamIndicator} | ^S:sessions  ^M:models  ^H:help  ^Q:quit `;
+    const bar = ` ${modelName} | ${this.messageCount} msgs${streamIndicator} | ^S:sessions  ^P:models  ^Q:quit `;
     this.setText(bar);
   }
 }

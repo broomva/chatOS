@@ -70,8 +70,13 @@ export class ChatApp {
 
   /** Start the TUI event loop. */
   async start(initialSessionId?: string): Promise<void> {
-    // Intercept raw input for keybindings before the editor sees it
-    this.tui.onDebug = () => this.toggleHelp();
+    // Register global keybindings before the editor consumes input
+    this.tui.addInputListener((data: string) => {
+      if (this.handleGlobalKey(data)) {
+        return { consume: true };
+      }
+      return undefined;
+    });
 
     if (initialSessionId) {
       await this.switchSession(initialSessionId);
@@ -102,11 +107,6 @@ export class ChatApp {
     // Ctrl+P — model picker (Ctrl+M = \x0d conflicts with Enter)
     if (data === "\x10") {
       this.showModelPicker();
-      return true;
-    }
-    // Ctrl+H — help
-    if (data === "\x08") {
-      this.toggleHelp();
       return true;
     }
     return false;

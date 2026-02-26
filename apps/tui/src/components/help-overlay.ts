@@ -7,8 +7,7 @@ const HELP_TEXT = `
   Enter          Send message
   Shift+Enter    New line in editor
   Ctrl+S         Switch session
-  Ctrl+M         Change model
-  Ctrl+H         Toggle this help
+  Ctrl+P         Change model
   Ctrl+Q         Quit
 
   Esc            Close overlay

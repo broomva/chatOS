@@ -10,8 +10,9 @@
     "dist"
   ],
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "bun run build",
     "start": "bun src/index.ts",
+    "tui": "bun src/index.ts",
     "build": "bun run scripts/build.ts",
     "prepublishOnly": "bun run build",
     "lint": "biome check --diagnostic-level=error .",
