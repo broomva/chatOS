@@ -6,6 +6,7 @@ import {
   systemPrompt,
   weatherTool,
 } from "@chatos/ai";
+import { getAITelemetrySettings } from "@chatos/ai/telemetry";
 import type { AgentStateStore } from "@chatos/state";
 import type { AgentMessage, MessagePart } from "@chatos/types";
 import { stepCountIs, streamText } from "ai";
@@ -142,6 +143,12 @@ async function cmdSend(args: string[], store: AgentStateStore): Promise<void> {
     system: systemPrompt({ selectedChatModel: model }),
     messages,
     tools: { getWeather: weatherTool },
+    experimental_telemetry: getAITelemetrySettings({
+      agentId: AGENT_ID,
+      sessionId,
+      model,
+      platform: "cli",
+    }),
     stopWhen: stepCountIs(5),
   });
 

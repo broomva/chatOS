@@ -1,3 +1,4 @@
+import "./instrumentation";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { healthRoutes } from "./routes/health";

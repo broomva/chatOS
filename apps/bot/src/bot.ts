@@ -1,6 +1,7 @@
 import { gateway } from "@ai-sdk/gateway";
 import { createSlackAdapter, type SlackAdapter } from "@chat-adapter/slack";
 import { DEFAULT_CHAT_MODEL, persistStreamResult, systemPrompt, weatherTool } from "@chatos/ai";
+import { getAITelemetrySettings } from "@chatos/ai/telemetry";
 import {
   AgentStateAdapter,
   AgentStateStore,
@@ -63,6 +64,12 @@ async function handleMessage(
     system: systemPrompt({ selectedChatModel: DEFAULT_CHAT_MODEL }),
     messages,
     tools: { getWeather: weatherTool },
+    experimental_telemetry: getAITelemetrySettings({
+      agentId: AGENT_ID,
+      sessionId: session.id,
+      model: DEFAULT_CHAT_MODEL,
+      platform: "slack",
+    }),
     stopWhen: stepCountIs(5),
   });
 

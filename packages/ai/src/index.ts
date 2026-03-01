@@ -4,6 +4,7 @@ export * from "./persist";
 export * from "./prompts";
 export * from "./queue";
 export * from "./streaming";
+export * from "./telemetry";
 
 export {
   createDocumentTool,

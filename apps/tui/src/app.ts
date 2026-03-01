@@ -1,6 +1,7 @@
 import { gateway } from "@ai-sdk/gateway";
 import { DEFAULT_CHAT_MODEL, persistStreamResult, systemPrompt, weatherTool } from "@chatos/ai";
 import { AgentEventEmitter, eventTimestamp } from "@chatos/ai/events";
+import { getAITelemetrySettings } from "@chatos/ai/telemetry";
 import type { AgentStateStore } from "@chatos/state";
 import type { AgentMessage, MessagePart } from "@chatos/types";
 import { type OverlayHandle, type ProcessTerminal, Text, TUI } from "@mariozechner/pi-tui";
@@ -166,6 +167,12 @@ export class ChatApp {
         system: systemPrompt({ selectedChatModel: this.selectedModel }),
         messages,
         tools: { getWeather: weatherTool },
+        experimental_telemetry: getAITelemetrySettings({
+          agentId: AGENT_ID,
+          sessionId: this.sessionId ?? undefined,
+          model: this.selectedModel,
+          platform: "tui",
+        }),
         stopWhen: stepCountIs(5),
       });
 

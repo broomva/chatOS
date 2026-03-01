@@ -1,5 +1,6 @@
 import type { AgentStateStore } from "@chatos/state";
 import type { MessagePart, Source } from "@chatos/types";
+import { bridgeObservationToSpan } from "./telemetry";
 
 // ─── Types ──────────────────────────────────────────
 
@@ -171,8 +172,8 @@ export async function persistStreamResult(
     model: ctx.model,
   });
 
-  // Record observation
-  await ctx.store.record({
+  // Record observation and bridge to OTel
+  const obs = await ctx.store.record({
     agentId: ctx.agentId,
     sessionId: ctx.sessionId,
     type: "event",
@@ -189,4 +190,6 @@ export async function persistStreamResult(
       ...(data.finishReason && { finishReason: data.finishReason }),
     },
   });
+
+  bridgeObservationToSpan(obs);
 }

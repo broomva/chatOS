@@ -1,6 +1,7 @@
 import { gateway } from "@ai-sdk/gateway";
 import { persistStreamResult, type StreamFinishData, systemPrompt, weatherTool } from "@chatos/ai";
 import { DEFAULT_CHAT_MODEL } from "@chatos/ai/models";
+import { getAITelemetrySettings } from "@chatos/ai/telemetry";
 import {
   AgentStateStore,
   LocalStorageBackend,
@@ -52,6 +53,12 @@ export async function POST(request: Request) {
     tools: {
       getWeather: weatherTool,
     },
+    experimental_telemetry: getAITelemetrySettings({
+      agentId: AGENT_ID,
+      sessionId,
+      model: modelId,
+      platform: "web",
+    }),
     stopWhen: stepCountIs(5),
     async onFinish({ text, steps, totalUsage, finishReason }) {
       if (sessionId) {

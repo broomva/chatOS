@@ -1,6 +1,7 @@
 // ─── Agent ─────────────────────────────────────────
 export * from "./agent";
 export * from "./state";
+export * from "./telemetry";
 
 // ─── User & Auth ────────────────────────────────────
 export type User = {
