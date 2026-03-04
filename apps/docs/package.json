@@ -17,14 +17,14 @@
     "next": "^16.0.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "shiki": "^3.23.0"
+    "shiki": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
     "@types/mdx": "^2.0.13",
-    "@types/node": "^22.8.6",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "postcss": "^8",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.8.3"
