@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.15",
-    "@mariozechner/pi-tui": "^0.55.0",
+    "@mariozechner/pi-tui": "^0.57.1",
     "ai": "^6.0.37",
     "chalk": "^5.5.0"
   },
