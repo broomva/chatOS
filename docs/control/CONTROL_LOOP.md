@@ -1,3 +1,15 @@
+---
+tags:
+  - broomva
+  - chatos
+  - control
+  - governance
+type: operations
+status: active
+area: control-loop
+created: 2026-03-17
+---
+
 # Control Loop
 
 ## Feedback Mechanism

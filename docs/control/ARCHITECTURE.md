@@ -1,3 +1,14 @@
+---
+tags:
+  - broomva
+  - chatos
+  - architecture
+type: architecture
+status: active
+area: system
+created: 2026-03-17
+---
+
 # Architecture
 
 ## System Overview
