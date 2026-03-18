@@ -1,3 +1,14 @@
+---
+tags:
+  - broomva
+  - chatos
+  - observability
+type: operations
+status: active
+area: observability
+created: 2026-03-17
+---
+
 # Observability
 
 ## Structured Log Fields
