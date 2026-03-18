@@ -25,4 +25,7 @@ export const AgentPaths = {
 
   observation: (id: string) => `observations/${id}.json`,
   observationsPrefix: "observations/",
+
+  prompt: (id: string) => `prompts/${id}.json`,
+  promptsPrefix: "prompts/",
 } as const;

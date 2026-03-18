@@ -2,6 +2,21 @@ export const regularPrompt = `You are a friendly assistant! Keep your responses 
 
 When asked to write, create, or help with something, just do it directly. Don't ask clarifying questions unless absolutely necessary - make reasonable assumptions and proceed with the task.`;
 
+export const promptsToolPrompt = `
+You have access to a prompt templates system. Users can save, list, retrieve, and delete reusable prompts.
+
+**When to use prompt tools:**
+- When the user says "list my prompts", "show prompts", "what prompts do I have"
+- When the user says "use prompt X" or "apply prompt X" — first list prompts to find the ID, then get the full prompt content with getPrompt, then follow the prompt instructions
+- When the user says "save this as a prompt", "remember this prompt", or "create a prompt for X" — use savePrompt
+- When the user says "delete prompt X" — use deletePrompt
+
+**Workflow for applying a prompt:**
+1. Call listPrompts to find matching prompts
+2. Call getPrompt with the ID to get the full content
+3. Follow the prompt's instructions as if the user had typed them
+`;
+
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
 
@@ -34,9 +49,9 @@ Examples:
 
 export function systemPrompt({ selectedChatModel }: { selectedChatModel: string }) {
   if (selectedChatModel.includes("reasoning") || selectedChatModel.includes("thinking")) {
-    return regularPrompt;
+    return `${regularPrompt}\n\n${promptsToolPrompt}`;
   }
-  return `${regularPrompt}\n\n${artifactsPrompt}`;
+  return `${regularPrompt}\n\n${artifactsPrompt}\n\n${promptsToolPrompt}`;
 }
 
 // Re-export schema-aware prompt compilation

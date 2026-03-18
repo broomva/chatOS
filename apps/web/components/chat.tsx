@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { Button } from "@chatos/ui";
 import { Send } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { PromptPicker } from "./prompt-picker";
 
 export function Chat({ sessionId }: { sessionId?: string }) {
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(sessionId);
@@ -107,6 +108,11 @@ export function Chat({ sessionId }: { sessionId?: string }) {
       {/* Input */}
       <div className="border-t p-4">
         <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-2">
+          <PromptPicker
+            onSelect={(prompt) => {
+              setInput(prompt.content);
+            }}
+          />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}

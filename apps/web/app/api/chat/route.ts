@@ -8,7 +8,8 @@ import {
   resolveStateDir,
   VercelBlobBackend,
 } from "@chatos/state";
-import { convertToModelMessages, stepCountIs, streamText } from "ai";
+import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
+import { z } from "zod";
 
 export const maxDuration = 60;
 
@@ -52,6 +53,78 @@ export async function POST(request: Request) {
     messages: modelMessages,
     tools: {
       getWeather: weatherTool,
+      listPrompts: tool({
+        description:
+          "List the user's saved prompt templates. Use when the user asks to see their prompts or wants to use a saved prompt.",
+        inputSchema: z.object({
+          tag: z.string().optional().describe("Filter prompts by tag"),
+          search: z.string().optional().describe("Search term to filter by title or description"),
+        }),
+        execute: async ({ tag, search }) => {
+          const prompts = await store.listPrompts({ tag: tag ?? undefined });
+          const filtered = search
+            ? prompts.filter(
+                (p) =>
+                  p.title.toLowerCase().includes(search.toLowerCase()) ||
+                  p.description?.toLowerCase().includes(search.toLowerCase()),
+              )
+            : prompts;
+          return filtered.map((p) => ({
+            id: p.id,
+            title: p.title,
+            description: p.description,
+            tags: p.tags,
+          }));
+        },
+      }),
+      getPrompt: tool({
+        description:
+          "Get the full content of a saved prompt template by ID. Use after listing prompts to retrieve the actual prompt text.",
+        inputSchema: z.object({
+          id: z.string().describe("The prompt template ID"),
+        }),
+        execute: async ({ id }) => {
+          const prompt = await store.getPrompt(id);
+          if (!prompt) return { error: "Prompt not found" };
+          return prompt;
+        },
+      }),
+      savePrompt: tool({
+        description:
+          "Save a new prompt template or update an existing one. Use when the user wants to save a prompt for reuse.",
+        inputSchema: z.object({
+          id: z.string().optional().describe("If updating an existing prompt, pass its ID"),
+          title: z.string().describe("Short descriptive title for the prompt"),
+          content: z.string().describe("The full prompt text"),
+          description: z.string().optional().describe("Brief description of what this prompt does"),
+          tags: z.array(z.string()).optional().describe("Tags for categorizing the prompt"),
+        }),
+        execute: async ({ id, title, content, description, tags }) => {
+          if (id) {
+            const updated = await store.updatePrompt(id, { title, content, description, tags });
+            if (!updated) return { error: "Prompt not found" };
+            return { id: updated.id, title: updated.title, saved: true };
+          }
+          const created = await store.createPrompt({
+            title,
+            content,
+            description,
+            tags,
+            visibility: "private",
+          });
+          return { id: created.id, title: created.title, saved: true };
+        },
+      }),
+      deletePrompt: tool({
+        description: "Delete a saved prompt template by ID.",
+        inputSchema: z.object({
+          id: z.string().describe("The prompt template ID to delete"),
+        }),
+        execute: async ({ id }) => {
+          const deleted = await store.deletePrompt(id);
+          return { deleted };
+        },
+      }),
     },
     experimental_telemetry: getAITelemetrySettings({
       agentId: AGENT_ID,

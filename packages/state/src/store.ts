@@ -3,6 +3,7 @@ import type {
   AgentSchema,
   MemoryItem,
   Observation,
+  PromptTemplate,
   SessionState,
 } from "@chatos/types";
 import { nanoid } from "nanoid";
@@ -144,6 +145,67 @@ export class AgentStateStore {
       }
     }
     return items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  // ─── Prompts ────────────────────────────────────
+
+  async createPrompt(
+    params: Omit<PromptTemplate, "id" | "createdAt" | "updatedAt">,
+  ): Promise<PromptTemplate> {
+    const now = new Date().toISOString();
+    const prompt: PromptTemplate = {
+      id: nanoid(),
+      ...params,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await this.backend.write(AgentPaths.prompt(prompt.id), JSON.stringify(prompt, null, 2));
+    return prompt;
+  }
+
+  async getPrompt(id: string): Promise<PromptTemplate | null> {
+    const raw = await this.backend.read(AgentPaths.prompt(id));
+    return raw ? (JSON.parse(raw) as PromptTemplate) : null;
+  }
+
+  async updatePrompt(
+    id: string,
+    update: Partial<Omit<PromptTemplate, "id" | "createdAt">>,
+  ): Promise<PromptTemplate | null> {
+    const existing = await this.getPrompt(id);
+    if (!existing) return null;
+    const updated: PromptTemplate = {
+      ...existing,
+      ...update,
+      id: existing.id,
+      createdAt: existing.createdAt,
+      updatedAt: new Date().toISOString(),
+    };
+    await this.backend.write(AgentPaths.prompt(id), JSON.stringify(updated, null, 2));
+    return updated;
+  }
+
+  async deletePrompt(id: string): Promise<boolean> {
+    const existing = await this.getPrompt(id);
+    if (!existing) return false;
+    await this.backend.delete(AgentPaths.prompt(id));
+    return true;
+  }
+
+  async listPrompts(opts?: { userId?: string; tag?: string }): Promise<PromptTemplate[]> {
+    const keys = await this.backend.list({ prefix: AgentPaths.promptsPrefix });
+    const prompts: PromptTemplate[] = [];
+    for (const key of keys) {
+      const raw = await this.backend.read(key);
+      if (raw) {
+        const prompt = JSON.parse(raw) as PromptTemplate;
+        if (opts?.userId && prompt.userId !== opts.userId && prompt.visibility !== "public")
+          continue;
+        if (opts?.tag && !prompt.tags?.includes(opts.tag)) continue;
+        prompts.push(prompt);
+      }
+    }
+    return prompts.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }
 
   // ─── Observations ────────────────────────────────

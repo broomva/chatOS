@@ -56,6 +56,20 @@ export type MemoryItem = {
   updatedAt: string; // ISO 8601
 };
 
+// ─── Prompts ────────────────────────────────────────
+
+export type PromptTemplate = {
+  id: string;
+  userId?: string;
+  title: string;
+  content: string;
+  description?: string;
+  tags?: string[];
+  visibility: "public" | "private";
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+};
+
 // ─── Observations ────────────────────────────────────
 
 export type ObservationType = "metric" | "event" | "error" | "decision";

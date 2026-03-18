@@ -8,7 +8,11 @@ export * from "./telemetry";
 
 export {
   createDocumentTool,
+  deletePromptTool,
+  getPromptTool,
+  listPromptsTool,
   requestSuggestionsTool,
+  savePromptTool,
   updateDocumentTool,
   weatherTool,
 } from "./tools";

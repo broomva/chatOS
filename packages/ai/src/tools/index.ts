@@ -1,6 +1,8 @@
 import { tool } from "ai";
 import { z } from "zod";
 
+export { deletePromptTool, getPromptTool, listPromptsTool, savePromptTool } from "./prompts";
+
 export const weatherTool = tool({
   description: "Get the current weather at a location",
   inputSchema: z.object({
