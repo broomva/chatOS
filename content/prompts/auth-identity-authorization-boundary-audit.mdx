@@ -1,0 +1,184 @@
+---
+title: "Auth Identity Authorization Boundary Audit"
+summary: ""
+date: 2026-03-18
+published: false
+category: agent-instructions
+version: "1.0"
+tags:
+  - auth
+  - security
+  - identity
+  - authorization
+  - audit
+  - production
+---
+
+You are performing a production-grade authentication, identity, and authorization-boundary audit for this project.
+
+Objective:
+Inspect the current auth system end to end, determine how it works, evaluate whether it is secure and follows best practices, identify implementation risks or architectural flaws, and fix issues where appropriate.
+
+Core audit goals:
+1. Explain how authentication works in this project end to end.
+2. Determine whether the current implementation is secure.
+3. Evaluate whether the auth provider/library/framework is being used correctly and according to best practices.
+4. Verify how users are represented and resolved in the backend.
+5. Verify how identities from multiple login methods/providers are linked to the same canonical user.
+6. Audit session, token, cookie, and request-boundary handling.
+7. Audit middleware, proxy, gateway, and route protection behavior.
+8. Audit database schema and persistence patterns related to users, accounts, sessions, organizations, and permissions.
+9. Identify gaps, edge cases, race conditions, spoofing risks, and duplicate-account risks.
+10. If needed, implement fixes, add tests, update docs, and validate the result.
+
+Audit scope:
+- authentication flows
+- identity/account linking flows
+- authorization boundary propagation
+- middleware and route protection
+- backend user resolution
+- provider integrations
+- session/token handling
+- cookie configuration
+- database schema and constraints
+- security-sensitive environment/config usage
+- account lifecycle flows such as signup, login, logout, callback, refresh, password reset, email verification, account linking, and account deletion where applicable
+
+Execution requirements:
+1. Inspect the actual implementation before making assumptions.
+2. Identify:
+   - which auth provider, library, or framework is in use
+   - where authentication happens
+   - how sessions or tokens are issued and validated
+   - how the backend resolves the authenticated principal
+   - how external identities are linked to internal users
+   - how authorization context is propagated through the system
+   - how the database stores users, accounts, sessions, memberships, and permissions
+3. Explain the current architecture end to end:
+   - client flow
+   - auth callback flow
+   - backend/session flow
+   - middleware/proxy flow
+   - database identity model
+   - authorization model if relevant
+4. Evaluate best practices and security across:
+   - OAuth/OIDC handling
+   - email/password handling
+   - password hashing and reset flows
+   - session management
+   - JWT usage if present
+   - cookie security flags
+   - CSRF protections where relevant
+   - callback validation
+   - redirect safety
+   - secrets/config handling
+   - email verification and trust assumptions
+   - account linking behavior
+   - duplicate-account prevention
+   - DB uniqueness and foreign key constraints
+   - race conditions during signup/linking
+   - middleware trust boundaries
+   - spoofing resistance
+   - least-privilege enforcement
+5. Explicitly reason through or test common identity scenarios:
+   - signup with email/password
+   - later login with Google using same email
+   - later login with GitHub using same email
+   - login with an OAuth provider that does not guarantee verified email
+   - login with hidden/private email provider behavior
+   - account linking after prior user creation
+   - duplicate signups under concurrency
+6. Determine whether all of these correctly resolve to one canonical backend user when appropriate, and whether they fail safely when not appropriate.
+7. Audit route protection and request propagation:
+   - middleware
+   - reverse proxy behavior
+   - server-side auth context lookup
+   - forwarding headers
+   - internal API trust model
+   - client-spoofable headers
+8. Audit the database usage:
+   - user table design
+   - provider-account linking design
+   - session storage
+   - membership/tenant/org linkage if applicable
+   - indexes and uniqueness constraints
+   - referential integrity
+   - environment separation
+9. If issues are found:
+   - explain them precisely
+   - identify root cause
+   - propose the correct model
+   - implement fixes where appropriate
+   - add or update tests
+   - update documentation
+10. Validate everything and ensure the project is left in a production-ready state.
+
+Required audit domains:
+1. Authentication layer
+   - provider setup
+   - auth flow correctness
+   - session/token/cookie handling
+2. Identity resolution layer
+   - canonical user model
+   - external account linking
+   - duplicate-account prevention
+   - verified email handling
+3. Authorization propagation layer
+   - middleware
+   - proxy/gateway handling
+   - backend principal resolution
+   - tenant/org/user context propagation
+4. Persistence layer
+   - schema design
+   - constraints
+   - linking integrity
+   - race-condition resistance
+
+Specific questions to answer:
+- What is the canonical user model?
+- What identifies a real user internally?
+- How are provider accounts linked to that canonical user?
+- Can the same real person accidentally create multiple backend users?
+- Is email treated safely as an identifier?
+- Are verified and unverified emails handled correctly?
+- Are provider trust assumptions explicit and correct?
+- Are route protection and middleware secure?
+- Are session and token boundaries well defined?
+- Are DB constraints strong enough to prevent inconsistent identity state?
+- Is the implementation production-ready?
+
+Quality bar:
+- do not provide generic auth advice without grounding it in the current codebase
+- do not assume account linking works; verify it
+- do not assume provider guarantees; inspect implementation
+- do not conflate authentication with authorization
+- do not claim security without identifying specific controls
+- do not stop at documentation; verify behavior against code and schema
+
+Definition of done:
+- auth architecture is clearly explained end to end
+- security posture is assessed concretely
+- identity resolution behavior is verified
+- multi-provider account linking behavior is verified
+- middleware/proxy/gateway auth propagation is verified
+- DB schema and auth persistence are verified
+- issues are fixed where appropriate
+- tests/checks pass
+- docs are updated
+- final state is production-ready or remaining risks are clearly documented
+
+Final output:
+Provide a final summary including:
+1. current auth architecture
+2. provider/framework in use
+3. canonical user and identity-linking model
+4. session/token model
+5. middleware/proxy/gateway findings
+6. database/schema findings
+7. duplicate-account and linking findings
+8. verified-email and provider-trust findings
+9. security issues found
+10. files changed
+11. tests/checks run and results
+12. final verdict on whether the auth setup is secure and production-ready
+13. prioritized follow-up items if anything remains
