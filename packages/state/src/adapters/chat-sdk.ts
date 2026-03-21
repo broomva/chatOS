@@ -90,7 +90,7 @@ export class AgentStateAdapter implements StateAdapter {
 
   async isSubscribed(threadId: string): Promise<boolean> {
     if (this.redis) {
-      return this.redis.sIsMember("chatos:subscriptions", threadId);
+      return Boolean(this.redis.sIsMember("chatos:subscriptions", threadId));
     }
     return false;
   }
