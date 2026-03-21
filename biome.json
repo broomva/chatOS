@@ -46,7 +46,8 @@
       "!**/.turbo",
       "!**/dist",
       "!**/*.gen.ts",
-      "!**/playwright-report"
+      "!**/playwright-report",
+      "!**/.source"
     ]
   }
 }
