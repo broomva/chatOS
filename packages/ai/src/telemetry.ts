@@ -89,17 +89,18 @@ export async function initTelemetry(serviceName?: string): Promise<void> {
   const { SimpleSpanProcessor, ConsoleSpanExporter } = await import(
     "@opentelemetry/sdk-trace-base"
   );
-  const { Resource } = await import("@opentelemetry/resources");
+  const { resourceFromAttributes } = await import("@opentelemetry/resources");
 
-  const resource = new Resource({
+  const resource = resourceFromAttributes({
     "service.name": serviceName || config.serviceName,
   });
 
-  const provider = new NodeTracerProvider({ resource });
+  // Build span processors list based on configured backends
+  const spanProcessors: InstanceType<typeof SimpleSpanProcessor>[] = [];
 
   // Console exporter
   if (config.console) {
-    provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+    spanProcessors.push(new SimpleSpanProcessor(new ConsoleSpanExporter()));
   }
 
   // Langfuse — uses standard OTLP exporter pointed at Langfuse's OTel endpoint
@@ -111,7 +112,7 @@ export async function initTelemetry(serviceName?: string): Promise<void> {
         Authorization: `Basic ${btoa(`${config.langfuse.publicKey}:${config.langfuse.secretKey}`)}`,
       },
     });
-    provider.addSpanProcessor(new SimpleSpanProcessor(langfuseExporter));
+    spanProcessors.push(new SimpleSpanProcessor(langfuseExporter));
   }
 
   // LangSmith — standard OTLP with x-api-key header
@@ -123,7 +124,7 @@ export async function initTelemetry(serviceName?: string): Promise<void> {
         "x-api-key": config.langsmith.apiKey,
       },
     });
-    provider.addSpanProcessor(new SimpleSpanProcessor(langsmithExporter));
+    spanProcessors.push(new SimpleSpanProcessor(langsmithExporter));
   }
 
   // Generic OTLP (Jaeger, Grafana Tempo, etc.)
@@ -132,9 +133,10 @@ export async function initTelemetry(serviceName?: string): Promise<void> {
     const otlpExporter = new OTLPTraceExporter({
       url: `${config.otlp.endpoint}/v1/traces`,
     });
-    provider.addSpanProcessor(new SimpleSpanProcessor(otlpExporter));
+    spanProcessors.push(new SimpleSpanProcessor(otlpExporter));
   }
 
+  const provider = new NodeTracerProvider({ resource, spanProcessors });
   provider.register();
   _initialized = true;
 }
