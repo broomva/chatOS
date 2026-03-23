@@ -3,8 +3,16 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".control/**"
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".control/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,6 +44,8 @@ jobs:
   audit:
     name: Control Audit
     runs-on: ubuntu-latest
+    # Only on main push, not every PR
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
 
