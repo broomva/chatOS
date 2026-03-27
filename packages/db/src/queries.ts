@@ -1,6 +1,6 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { chat, document, message, stream, user, vote } from "./schema";
+import { chat, document, message, sandboxEvent, sandboxInstance, sandboxSnapshot, stream, user, vote } from "./schema";
 
 export type Database = PostgresJsDatabase;
 
@@ -143,4 +143,74 @@ export async function createStream(db: Database, data: { id: string; chatId: str
 
 export async function deleteStream(db: Database, streamId: string) {
   await db.delete(stream).where(eq(stream.id, streamId));
+}
+
+// ─── Sandboxes ───────────────────────────────────────
+
+export async function listSandboxesByOrg(db: Database, organizationId: string) {
+  return db
+    .select()
+    .from(sandboxInstance)
+    .where(eq(sandboxInstance.organizationId, organizationId))
+    .orderBy(desc(sandboxInstance.createdAt));
+}
+
+export async function getSandboxById(db: Database, sandboxId: string) {
+  const [instance] = await db
+    .select()
+    .from(sandboxInstance)
+    .where(eq(sandboxInstance.sandboxId, sandboxId));
+  return instance;
+}
+
+export async function getSandboxSnapshots(db: Database, sandboxId: string) {
+  return db
+    .select()
+    .from(sandboxSnapshot)
+    .where(eq(sandboxSnapshot.sandboxId, sandboxId))
+    .orderBy(desc(sandboxSnapshot.createdAt));
+}
+
+export async function getSandboxRecentEvents(db: Database, sandboxId: string, limit = 20) {
+  return db
+    .select()
+    .from(sandboxEvent)
+    .where(eq(sandboxEvent.sandboxId, sandboxId))
+    .orderBy(desc(sandboxEvent.occurredAt))
+    .limit(limit);
+}
+
+export async function markSandboxDestroyed(db: Database, sandboxId: string) {
+  await db
+    .update(sandboxInstance)
+    .set({ status: "stopped", destroyedAt: new Date() })
+    .where(and(eq(sandboxInstance.sandboxId, sandboxId), isNull(sandboxInstance.destroyedAt)));
+}
+
+export async function insertSandboxSnapshot(
+  db: Database,
+  data: { sandboxId: string; snapshotId: string; trigger: string },
+) {
+  await db.update(sandboxInstance).set({ status: "snapshotted" }).where(eq(sandboxInstance.sandboxId, data.sandboxId));
+  const [result] = await db
+    .insert(sandboxSnapshot)
+    .values({ ...data, createdAt: new Date() })
+    .returning();
+  return result;
+}
+
+export async function countActiveSandboxesByOrg(db: Database, organizationId: string) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(sandboxInstance)
+    .where(and(eq(sandboxInstance.organizationId, organizationId), eq(sandboxInstance.status, "running")));
+  return row?.count ?? 0;
+}
+
+export async function countSnapshottedSandboxesByOrg(db: Database, organizationId: string) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(sandboxInstance)
+    .where(and(eq(sandboxInstance.organizationId, organizationId), eq(sandboxInstance.status, "snapshotted")));
+  return row?.count ?? 0;
 }
