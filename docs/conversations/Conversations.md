@@ -6,8 +6,8 @@ tags:
   - moc
 type: moc
 status: active
-created: 2026-03-21
-updated: 2026-03-21
+created: 2026-04-24
+updated: 2026-04-24
 related:
   - "[[Documentation Hub]]"
   - "[[CLAUDE]]"
@@ -22,34 +22,19 @@ related:
 > tool usage, files modified, and commits — linking agent work to the
 > knowledge graph.
 
-**Total sessions indexed**: 11
+**Total sessions indexed**: 1
 
-## 2026-02-26
-
-| Session | Branch | Turns | Duration | Topic |
-|---------|--------|-------|----------|-------|
-| [[session-2026-02-26-4a88ee59]] | `main` | 6 | 47m | Implement the following plan:   Wire rich streamin |
-| [[session-2026-02-26-91960cda]] | `main` | 2 | 37m | lets review the observability and tracing of the c |
-| [[session-2026-02-26-39b2b127]] | `main` | 2 | 16m | Implement the following plan:   Add CLI subcommand |
-| [[session-2026-02-26-624f92aa]] | `main` | 1 | 4m | running bun dev opens the tui and it breaks the te |
-| [[session-2026-02-26-831e8e90]] | `main` | 1 | 11h 44m | Implement the following plan:   chatOS Observabili |
-
-## 2026-02-25
+## 2026-04-01
 
 | Session | Branch | Turns | Duration | Topic |
 |---------|--------|-------|----------|-------|
-| [[session-2026-02-25-62e2a04d]] | `main` | 2 | 1h 28m | please update /Users/broomva/broomva.tech/live/cha |
-| [[session-2026-02-25-0993e272]] | `main` | 1 | 47m | lets work on the @apps/docs/ , please make sure th |
-| [[session-2026-02-25-62a57321]] | `main` | 1 | 19m | Implement the following plan:   Plan: OpenAPI Docu |
-| [[session-2026-02-25-1f7665bc]] | `main` | 5 | 1h 15m | Implement the following plan:   Unified Agent Stat |
-| [[session-2026-02-25-671c8c67]] | `main` | 4 | 29m | Implement the following plan:   Leveraging pi-mono |
-| [[session-2026-02-25-50f4bb4d]] | `main` | 19 | 4h 20m | Implement the following plan:   Publish chatOS as  |
+| [[session-2026-04-01-936243e4]] | `feature/bro-261-sandbox-ui` | 3 | 36m | please remove any mention of "stimulus" within thi |
 
 ## Statistics
 
-- **Total turns**: 44
+- **Total turns**: 3
 - **Branches worked on**: 1
-- **Date range**: 2026-02-25 → 2026-02-26
+- **Date range**: 2026-04-01 → 2026-04-01
 
 ---
 
