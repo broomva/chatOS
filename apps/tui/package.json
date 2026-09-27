@@ -36,15 +36,15 @@
     "url": "git+https://github.com/broomva/chatOS.git"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "^3.0.15",
-    "@mariozechner/pi-tui": "^0.57.1",
-    "ai": "^6.0.37",
+    "@ai-sdk/gateway": "^3.0.203",
+    "@mariozechner/pi-tui": "^0.73.1",
+    "ai": "^6.0.293",
     "chalk": "^5.5.0"
   },
   "devDependencies": {
     "@chatos/ai": "workspace:*",
     "@chatos/state": "workspace:*",
     "@chatos/types": "workspace:*",
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   }
 }

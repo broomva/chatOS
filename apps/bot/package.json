@@ -11,7 +11,7 @@
     "openapi:export": "bun src/openapi/spec-export.ts"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "^3.0.15",
+    "@ai-sdk/gateway": "^3.0.203",
     "@chat-adapter/slack": "^4.14.0",
     "@chat-adapter/state-memory": "^4.14.0",
     "@chat-adapter/state-redis": "^4.14.0",
@@ -19,13 +19,13 @@
     "@chatos/state": "workspace:*",
     "@chatos/types": "workspace:*",
     "@elysiajs/openapi": "^1.0.0",
-    "ai": "^6.0.37",
+    "ai": "^6.0.293",
     "chat": "^4.14.0",
     "elysia": "^1.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   }
 }

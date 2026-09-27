@@ -16,7 +16,7 @@
     "better-auth": "^1.2.0"
   },
   "devDependencies": {
-    "next": "^16.1.6",
-    "typescript": "^5.8.3"
+    "next": "^16.3.6",
+    "typescript": "^6.0.3"
   }
 }
