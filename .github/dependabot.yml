@@ -1,6 +1,10 @@
+# Version updates disabled (open-pull-requests-limit: 0): repo is dormant.
+# Dependabot security updates are unaffected; they use a separate internal limit.
+# BRO-2600
 version: 2
 updates:
   - package-ecosystem: "npm"
+    open-pull-requests-limit: 0
     directory: "/"
     schedule:
       interval: "weekly"
@@ -8,8 +12,8 @@ updates:
       production-dependencies:
         patterns:
           - "*"
-    open-pull-requests-limit: 10
   - package-ecosystem: "github-actions"
+    open-pull-requests-limit: 0
     directory: "/"
     schedule:
       interval: "weekly"
